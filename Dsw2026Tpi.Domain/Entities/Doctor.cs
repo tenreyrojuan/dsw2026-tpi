@@ -4,9 +4,11 @@ public class Doctor: EntityBase
 {
     public string Name { get; init; }
     public string LicenseNumber { get; init; }
-    public bool IsActive { get; private set; }
     public Guid? SpecialityId { get; set; }
     public Speciality? Speciality { get; private set; }
+
+    // Collection Navigation (to the "many" side) one-to-many relationship, un 1 doctor tiene N disponibilidades
+    public ICollection<Availability> Availabilities { get; private set; } = [];
 
     #region Constructor for EF
 #pragma warning disable CS8618
@@ -21,11 +23,5 @@ public class Doctor: EntityBase
         Name = name;
         LicenseNumber = licenseNumber;
         Speciality = speciality;
-        IsActive = true;
-    }
-
-    public void Deactivate()
-    {
-        IsActive = false;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Dsw2026Tpi.Domain.Entities;
+﻿using System.Data;
+
+namespace Dsw2026Tpi.Domain.Entities;
 
 public abstract class EntityBase(Guid? id = null)
 {
@@ -6,4 +8,12 @@ public abstract class EntityBase(Guid? id = null)
 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    // propiedad y metodo para soft delete
+    public bool IsActive { get; private set; } = true;
+
+    public void Deactivate()
+    {
+        IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }
