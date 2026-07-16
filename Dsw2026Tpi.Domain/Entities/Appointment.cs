@@ -8,8 +8,8 @@ public class Appointment : EntityBase
 {
     public string Reason { get; private set; }
 
-    public DateTime? AttendedAt { get; private set; } //ex ServiceDate (momento de la cita)
-    public DateTime? CancelledAt{ get; private set; } // mejor at que date. Linea 11 y 12 es private set en vez de init sino es inmutable (ilogico) (ver linea 38 y 44)
+    public DateTime? AttendedAt { get; private set; }
+    public DateTime? CancelledAt{ get; private set; }
     public AppointmentState AppointmentState { get; private set; }
     
     public Guid PatientId { get; init; }

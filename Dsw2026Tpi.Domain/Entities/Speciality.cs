@@ -2,7 +2,7 @@
 
 public class Speciality: EntityBase
 {
-    public string Name { get; init; } /* [Consultar] : no es mejor private set? pues con init es inmutable y no colabora con el CRUD completo (fallaria en el PUT)*/
+    public string Name { get; init; }
     public string Description { get; init; }
 
     #region Constructor for EF

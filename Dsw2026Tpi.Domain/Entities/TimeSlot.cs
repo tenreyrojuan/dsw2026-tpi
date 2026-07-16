@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Dsw2026Tpi.Domain.Entities;
-//Turno (debil respecto a la disponibilidad)
+//Turno
 public class TimeSlot : EntityBase
 {
     public DateOnly Date { get; init; }
@@ -12,10 +12,10 @@ public class TimeSlot : EntityBase
 
     public TimeSlotState TimeSlotState { get; private set; }
 
-    // Reference navigation (to "one" side) 1 disponibilidad -> N turnos
+    public Guid AvailabilityId { get; private set; }
+
     public Availability Availability { get; private set; }
 
-    // relacion: puede o no haber una cita asignada al turno
     public Appointment? Appointment { get; private set; } 
 
     #region Constructor for EF
@@ -30,6 +30,7 @@ public class TimeSlot : EntityBase
         Date = date;
         StartingTime = startingTime;
         EndingTime = endingTime;
+        AvailabilityId = availability.Id;
         Availability = availability;
         TimeSlotState = TimeSlotState.Available;
     }

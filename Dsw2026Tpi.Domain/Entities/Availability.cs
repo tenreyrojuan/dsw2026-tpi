@@ -2,23 +2,21 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Dsw2026Tpi.Domain.Entities;
 //Disponibilidad
 public class Availability : EntityBase
 {
-    public int Month { get; private set; } /*[Consultar]: estas 5 no deberian ser init, para que sea inmutable la disponibilidad a menos que se la borre*/
-    public int Year { get; private set; }
-    public int WeekDay { get; private set; }
-    public TimeOnly StartingHour { get; private set; }
-    public TimeOnly EndingHour { get; private set; }
+    public int Month { get; init; } 
+    public int Year { get; init; }
+    public int WeekDay { get; init; }
+    public TimeOnly StartingHour { get; init; }
+    public TimeOnly EndingHour { get; init; }
 
     public Guid DoctorId { get; private set; }
-    // Reference navigation (to the "one" side) one-to-many relationship
+    
     public Doctor Doctor { get; private set; }
 
-    // Collection navigation (to the "many" side): Cada disponibilidad puede tener varios turnos
     public ICollection<TimeSlot> TimeSlots { get; private set; } = [];
 
     #region Constructor for EF

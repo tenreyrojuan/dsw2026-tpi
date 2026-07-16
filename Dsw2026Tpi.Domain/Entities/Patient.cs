@@ -10,7 +10,6 @@ public class Patient : EntityBase
     public string Name { get; init; }
     public string Phone { get; private set; }
 
-    // Collection Navigation (to the "many" side) one-to-many relationship, un 1 paciente gestiona N citas
     public ICollection<Appointment> Appointments { get; private set; } = [];
 
     #region Constructor for EF
