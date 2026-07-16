@@ -1,0 +1,22 @@
+﻿using Dsw2026Tpi.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Dsw2026Tpi.Data.Configurations;
+
+public class PatientConfiguration : IEntityTypeConfiguration<Patient>
+{
+    public void Configure(EntityTypeBuilder<Patient> builder)
+    {
+        builder.ToTable("PATIENTS");
+        builder.HasKey(p => p.Id);
+
+        builder.Property(p => p.IsActive).HasDefaultValue(true);
+
+        builder.Property(p => p.Dni).HasMaxLength(20).IsRequired();
+        builder.HasIndex(p => p.Dni).IsUnique();
+
+        builder.Property(p => p.Name).HasMaxLength(50).IsRequired();
+        builder.Property(p => p.Phone).HasMaxLength(20);
+    }
+}
