@@ -9,7 +9,7 @@ public class Availability : EntityBase
 {
     public int Month { get; init; } 
     public int Year { get; init; }
-    public int WeekDay { get; init; }
+    public DaysOfWeekEs WeekDay { get; init; }
     public TimeOnly StartingHour { get; init; }
     public TimeOnly EndingHour { get; init; }
 
@@ -26,7 +26,7 @@ public class Availability : EntityBase
     }
 #pragma warning restore CS8618
     #endregion
-    public Availability(int month, int year, int weekDay, TimeOnly startingHour,
+    public Availability(int month, int year, DaysOfWeekEs weekDay, TimeOnly startingHour,
         TimeOnly endingHour, Doctor doctor, Guid? id = null) : base(id)
     {
         Month = month;
