@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Dsw2026Tpi.Domain.Entities;
-//Turno (debil respecto a la disponibilidad)
+//Turno
 public class TimeSlot : EntityBase
 {
     public DateOnly Date { get; init; }
@@ -11,6 +11,8 @@ public class TimeSlot : EntityBase
     public TimeOnly EndingTime { get; init; }
 
     public TimeSlotState TimeSlotState { get; private set; }
+
+    public Guid AvailabilityId { get; init; }
 
     // Reference navigation (to "one" side) 1 disponibilidad -> N turnos
     public Availability Availability { get; private set; }
@@ -30,6 +32,7 @@ public class TimeSlot : EntityBase
         Date = date;
         StartingTime = startingTime;
         EndingTime = endingTime;
+        AvailabilityId = availability.Id;
         Availability = availability;
         TimeSlotState = TimeSlotState.Available;
     }
