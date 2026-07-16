@@ -13,7 +13,7 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
 
         builder.Property(a => a.IsActive).HasDefaultValue(true);
 
-        builder.Property(a => a.Reason).HasMaxLength(500).IsRequired();
+        builder.Property(a => a.Reason).HasMaxLength(100).IsRequired();
 
         builder.Property(a => a.AppointmentState)
                .HasConversion<string>()
