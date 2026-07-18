@@ -7,11 +7,15 @@ namespace Dsw2026Tpi.Domain.Entities;
 //Disponibilidad
 public class Availability : EntityBase
 {
+    /// <summary>
+    /// se cambiaron los modificadores de acceso de algunas propiedades
+    /// para poder actualizar las disponibilidades
+    /// </summary>
     public int Month { get; init; } 
     public int Year { get; init; }
-    public DaysOfWeekEs WeekDay { get; init; }
-    public TimeOnly StartingHour { get; init; }
-    public TimeOnly EndingHour { get; init; }
+    public DaysOfWeekEs WeekDay { get; private set; }
+    public TimeOnly StartingHour { get; private set; }
+    public TimeOnly EndingHour { get; private set; }
 
     public Guid DoctorId { get; private set; }
     
@@ -35,11 +39,19 @@ public class Availability : EntityBase
         StartingHour = startingHour;
         EndingHour = endingHour;
         Doctor = doctor;
-        DoctorId = doctor.Id;
     }
 
     public void AddTimeSlot(TimeSlot timeSlot)
     {
         TimeSlots.Add(timeSlot);
+    }
+
+    //metodo nuevo actualizar disponibilidad
+    public void UpdateAvailability(DaysOfWeekEs weekDay, TimeOnly startingHour, TimeOnly endingHour, Guid doctorId)
+    {
+        WeekDay = weekDay;
+        StartingHour = startingHour;
+        EndingHour = endingHour;
+        DoctorId = doctorId;
     }
 }

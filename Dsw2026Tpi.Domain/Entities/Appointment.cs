@@ -28,9 +28,7 @@ public class Appointment : EntityBase
                 TimeSlot timeSlot, string reason, Guid? id = null) : base(id)
     {
         Patient = patient;
-        PatientId = patient.Id;
         TimeSlot = timeSlot;
-        TimeSlotId = timeSlot.Id;
         Reason = reason;
         AppointmentState = AppointmentState.Confirmed;
     }

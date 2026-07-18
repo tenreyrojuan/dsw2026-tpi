@@ -8,7 +8,7 @@ public class SpecialityConfiguration : IEntityTypeConfiguration<Speciality>
 {
     public void Configure(EntityTypeBuilder<Speciality> builder)
     {
-        builder.ToTable("SPECIALITIES");
+        builder.ToTable("Specialities");
         builder.HasKey(e => e.Id);
 
         builder.Property(e => e.IsActive).HasDefaultValue(true);

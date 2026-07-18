@@ -30,7 +30,6 @@ public class TimeSlot : EntityBase
         Date = date;
         StartingTime = startingTime;
         EndingTime = endingTime;
-        AvailabilityId = availability.Id;
         Availability = availability;
         TimeSlotState = TimeSlotState.Available;
     }
