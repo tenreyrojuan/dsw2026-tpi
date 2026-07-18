@@ -1,10 +1,10 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 
-public class Doctor: EntityBase
+public class Doctor : EntityBase
 {
-    public string Name { get; init; }
-    public string LicenseNumber { get; init; }
-    public Guid? SpecialityId { get; set; }
+    public string Name { get; private set; }
+    public string LicenseNumber { get; private set; }
+    public Guid? SpecialityId { get; private set; }
     public Speciality? Speciality { get; private set; }
 
     public ICollection<Availability> Availabilities { get; private set; } = [];
@@ -18,6 +18,14 @@ public class Doctor: EntityBase
     #endregion
 
     public Doctor(string name, string licenseNumber, Speciality speciality, Guid? id = null) : base(id)
+    {
+        Name = name;
+        LicenseNumber = licenseNumber;
+        Speciality = speciality;
+    }
+
+    //metodo nuevo actualizar medicos
+    public void UpdateDoctor(string name, string licenseNumber, Speciality speciality)
     {
         Name = name;
         LicenseNumber = licenseNumber;

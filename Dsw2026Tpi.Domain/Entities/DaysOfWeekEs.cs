@@ -6,11 +6,11 @@ namespace Dsw2026Tpi.Domain.Entities;
 
 public enum DaysOfWeekEs
 {
-    Domingo = 0,
-    Lunes,
+    Lunes = 0,
     Martes,
     Miercoles,
     Jueves,
     Viernes,
-    Sabado
+    Sabado,
+    Domingo
 }
