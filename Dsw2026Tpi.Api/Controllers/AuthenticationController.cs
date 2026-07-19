@@ -13,7 +13,11 @@ public class AuthenticationController : AppController
     {
         _authenticationService = authenticationService;
     }
-
+    /// <summary>
+    /// Se esta enviando al servicio el DTOs
+    /// de la request. Deberiamos cambiar request por
+    /// un DTO independiente a la Api?
+    /// </summary>
     [HttpPost("admin/register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
