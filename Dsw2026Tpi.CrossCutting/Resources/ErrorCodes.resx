@@ -123,6 +123,9 @@
   <data name="AUTHORIZATION_FAILED" xml:space="preserve">
     <value>Se requieren permisos para la operación solicitada</value>
   </data>
+  <data name="BUSINESS_ERROR" xml:space="preserve">
+    <value>Se produjo un error al no cumplirse alguna regla de negocio</value>
+  </data>
   <data name="ENTITY_NOTFOUND" xml:space="preserve">
     <value>La entidad {0} no se encontró</value>
   </data>
