@@ -8,7 +8,7 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
 {
     public void Configure(EntityTypeBuilder<Appointment> builder)
     {
-        builder.ToTable("APPOINTMENTS");
+        builder.ToTable("Appointments");
         builder.HasKey(a => a.Id);
 
         builder.Property(a => a.IsActive).HasDefaultValue(true);

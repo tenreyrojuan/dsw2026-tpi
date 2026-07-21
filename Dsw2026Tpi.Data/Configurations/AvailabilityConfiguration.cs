@@ -8,7 +8,7 @@ public class AvailabilityConfiguration : IEntityTypeConfiguration<Availability>
 {
     public void Configure(EntityTypeBuilder<Availability> builder)
     {
-        builder.ToTable("AVAILABILITIES");
+        builder.ToTable("Availabilities");
         builder.HasKey(a => a.Id);
 
         builder.Property(a => a.IsActive).HasDefaultValue(true);

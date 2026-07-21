@@ -9,7 +9,7 @@ public class TimeSlotConfiguration : IEntityTypeConfiguration<TimeSlot>
 {
     public void Configure(EntityTypeBuilder<TimeSlot> builder)
     {
-        builder.ToTable("TIMESLOTS");
+        builder.ToTable("TimeSlots");
 
         builder.HasKey(t => t.Id);
 
