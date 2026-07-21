@@ -3,6 +3,7 @@ using Dsw2026Tpi.CrossCutting.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Dsw2026Tpi.Application.Dtos;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
@@ -40,7 +41,7 @@ public class DoctorController : AppController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AddDoctor([FromQuery]DoctorModel.Request request) 
+    public async Task<IActionResult> AddDoctor([FromBody]DoctorModel.Request request) 
     {
         await _service.AddDoctor(request.Name,request.LicenseNumber,request.SpecialityId);
         return Ok();
@@ -50,7 +51,7 @@ public class DoctorController : AppController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateDoctor([FromRoute]Guid id, [FromQuery]DoctorModel.Request request)
+    public async Task<IActionResult> UpdateDoctor([FromRoute]Guid id, [FromBody] DoctorModel.Request request)
     {
         await _service.UpdateDoctor(id,request.Name,request.LicenseNumber,request.SpecialityId);
         return Ok();
