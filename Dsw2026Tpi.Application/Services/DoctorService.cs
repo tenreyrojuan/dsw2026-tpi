@@ -26,12 +26,10 @@ public class DoctorService : IDoctorService
     /// </summary>
     public async Task<Pagination<DoctorModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
-        //faltaba verificar si los medicos estaban eliminados o no
         var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, 
                                                    d => d.IsActive == true && (string.IsNullOrWhiteSpace(name) ||
                                                    d.Name.Contains(name)), x => x.Name, nameof(Doctor.Speciality));
         
-        //faltaba Total
         return doctors.Map(d => new DoctorModel.Response(d.Id, d.Name, d.LicenseNumber,
             new DoctorModel.SpecialityDto(d.Speciality?.Id, d.Speciality?.Name),doctors.Total));
     }
@@ -44,29 +42,17 @@ public class DoctorService : IDoctorService
         Doctor? doctor = await _persistence.GetById<Doctor>(id)
             ?? throw new EntityNotFoundException(nameof(Doctor));
 
-        /// ademas de el id se busca por mes y año. Mes para respetar el endpoint y
-        /// el año para no traer resultados de años anteriores
         Expression<Func<Availability, bool>> predicate = a => a.DoctorId == id 
                                                          && a.Month == date.Month 
                                                          && a.Year == date.Year;
         // si no hay disponibilidades, se devuelve vacio
         var availabilities = await _persistence.GetFiltered<Availability>(predicate) ?? []; 
 
-        // evaluar a futuro como eliminar la basura del switch
+        
         return availabilities
             .OrderBy(a => a.WeekDay)
             .Select(a => new DoctorModel.AvailabilityDto(
-                a.WeekDay switch
-                {
-                    DaysOfWeekEs.Lunes => "LUNES",
-                    DaysOfWeekEs.Martes => "MARTES",
-                    DaysOfWeekEs.Miercoles => "MIERCOLES",
-                    DaysOfWeekEs.Jueves => "JUEVES",
-                    DaysOfWeekEs.Viernes => "VIERNES",
-                    DaysOfWeekEs.Sabado => "SABADO",
-                    DaysOfWeekEs.Domingo => "DOMINGO",
-                    _ => throw new BusinessRuleException("No es valido el dia", nameof(ErrorCodes.BUSINESS_ERROR))
-                },
+                nameof(a.WeekDay).ToUpper(), // Añadir comprobacion en los endpoints de availability
                 a.StartingHour.ToString("HH:mm"),
                 a.EndingHour.ToString("HH:mm")
                 )
