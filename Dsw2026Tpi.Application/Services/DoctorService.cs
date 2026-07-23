@@ -31,27 +31,27 @@ public class DoctorService : IDoctorService
                                                    d.Name.Contains(name)), x => x.Name, nameof(Doctor.Speciality));
         
         return doctors.Map(d => new DoctorModel.Response(d.Id, d.Name, d.LicenseNumber,
-            new DoctorModel.SpecialityDto(d.Speciality?.Id, d.Speciality?.Name),doctors.Total));
+            new DoctorModel.SpecialityDto(d.Speciality?.Id, d.Speciality?.Name)));
     }
 
-    public async Task<IEnumerable<DoctorModel.AvailabilityDto>> GetDoctorAvailabilities(Guid id,DateOnly date)
+    public async Task<IEnumerable<DoctorAvailabilityModel.Response>> GetDoctorAvailabilities(DoctorAvailabilityModel.Request request)
     {
-        if (!date.IsMonthValid() || !date.IsYearValid())
+        if (!request.Date.IsMonthValid() || !request.Date.IsYearValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR));
         
-        Doctor? doctor = await _persistence.GetById<Doctor>(id)
+        Doctor? doctor = await _persistence.GetById<Doctor>(request.Id)
             ?? throw new EntityNotFoundException(nameof(Doctor));
 
-        Expression<Func<Availability, bool>> predicate = a => a.DoctorId == id 
-                                                         && a.Month == date.Month 
-                                                         && a.Year == date.Year;
+        Expression<Func<Availability, bool>> predicate = a => a.DoctorId == request.Id
+                                                         && a.Month == request.Date.Month 
+                                                         && a.Year == request.Date.Year;
         // si no hay disponibilidades, se devuelve vacio
         var availabilities = await _persistence.GetFiltered<Availability>(predicate) ?? []; 
 
         
         return availabilities
             .OrderBy(a => a.WeekDay)
-            .Select(a => new DoctorModel.AvailabilityDto(
+            .Select(a => new DoctorAvailabilityModel.Response(
                 nameof(a.WeekDay).ToUpper(), // Añadir comprobacion en los endpoints de availability
                 a.StartingHour.ToString("HH:mm"),
                 a.EndingHour.ToString("HH:mm")
@@ -59,33 +59,33 @@ public class DoctorService : IDoctorService
             );
     }
 
-    public async Task AddDoctor(string name, string licenseNumber, Guid specialityId)
+    public async Task AddDoctor(DoctorModel.Request request)
     {
-        if (!name.IsNameValid())
+        if (!request.Name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
-                .WithDetail(nameof(name),
+                .WithDetail(nameof(request.Name),
                 "El nombre es invalido. El campo debe tener entre 3 y 100 caracteres, y no estar vacio.");
         
-        var speciality = await _persistence.First<Speciality>(s => s.Id == specialityId) 
+        var speciality = await _persistence.First<Speciality>(s => s.Id == request.SpecialityId) 
             ?? throw new EntityNotFoundException(nameof(Speciality));
 
-        var doctor = new Doctor(name, licenseNumber, speciality);
+        var doctor = new Doctor(request.Name, request.LicenseNumber, speciality);
         _ = await _persistence.Add<Doctor>(doctor);
     }
 
-    public async Task UpdateDoctor(Guid id, string name, string licenseNumber, Guid specialityId)
+    public async Task UpdateDoctor(DoctorUpdateModel.Request request)
     {
-        if (!name.IsNameValid())
+        if (!request.Name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
-                .WithDetail(nameof(name), "El nombre es invalido"); ;
+                .WithDetail(nameof(request.Name), "El nombre es invalido"); ;
 
-        var speciality = await _persistence.GetById<Speciality>(specialityId);
-        var doctor = await _persistence.GetById<Doctor>(id);
+        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
+        var doctor = await _persistence.GetById<Doctor>(request.Id);
 
         if (speciality is null || doctor is null)
             throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND);
 
-        doctor.UpdateDoctor(name, licenseNumber, speciality);
+        doctor.UpdateDoctor(request.Name, request.LicenseNumber, speciality);
 
         _ = await _persistence.Update<Doctor>(doctor);
     }
