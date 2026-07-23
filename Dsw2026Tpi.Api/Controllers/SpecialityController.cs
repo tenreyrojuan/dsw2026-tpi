@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dsw2026Tpi.Api.Controllers;
 
 [Route("specialities")]
-[Authorize]
+[Authorize(Policy = Policies.AdminPolicy)]
 public class SpecialityController : AppController
 {
     private readonly ISpecialityService _service;
@@ -26,7 +26,6 @@ public class SpecialityController : AppController
     }
 
     [HttpPost]
-    [Authorize(Policy = Policies.AdminPolicy)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -37,7 +36,6 @@ public class SpecialityController : AppController
     }
 
     [HttpPut("{id}")]
-    [Authorize(Policy = Policies.AdminPolicy)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -48,7 +46,6 @@ public class SpecialityController : AppController
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Policy = Policies.AdminPolicy)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSpeciality([FromRoute] Guid id)
