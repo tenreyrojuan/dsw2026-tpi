@@ -9,15 +9,19 @@ public class AuthenticationController : AppController
 {
     private readonly IAuthenticationService _authenticationService;
 
-    public AuthenticationController(IAuthenticationService authenticationService) 
+    public AuthenticationController(IAuthenticationService authenticationService)
     {
         _authenticationService = authenticationService;
     }
-
+    /// <summary>
+    /// Se esta enviando al servicio el DTOs
+    /// de la request. Deberiamos cambiar request por
+    /// un DTO independiente a la Api?
+    /// </summary>
     [HttpPost("admin/register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Register([FromBody] RegisterModel.Request request)
+    public async Task<IActionResult> Register([FromQuery] RegisterModel.Request request)
     {
         var result = await _authenticationService.Register(request);
         return Ok(result.Email); 

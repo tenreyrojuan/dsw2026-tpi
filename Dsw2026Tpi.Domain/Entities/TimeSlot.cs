@@ -12,12 +12,10 @@ public class TimeSlot : EntityBase
 
     public TimeSlotState TimeSlotState { get; private set; }
 
-    public Guid AvailabilityId { get; init; }
+    public Guid AvailabilityId { get; private set; }
 
-    // Reference navigation (to "one" side) 1 disponibilidad -> N turnos
     public Availability Availability { get; private set; }
 
-    // relacion: puede o no haber una cita asignada al turno
     public Appointment? Appointment { get; private set; } 
 
     #region Constructor for EF

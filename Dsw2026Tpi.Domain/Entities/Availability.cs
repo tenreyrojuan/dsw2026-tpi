@@ -7,17 +7,20 @@ namespace Dsw2026Tpi.Domain.Entities;
 //Disponibilidad
 public class Availability : EntityBase
 {
+    /// <summary>
+    /// se cambiaron los modificadores de acceso de algunas propiedades
+    /// para poder actualizar las disponibilidades
+    /// </summary>
     public int Month { get; init; } 
     public int Year { get; init; }
-    public int WeekDay { get; init; }
-    public TimeOnly StartingHour { get; init; }
-    public TimeOnly EndingHour { get; init; }
+    public DaysOfWeekEs WeekDay { get; private set; }
+    public TimeOnly StartingHour { get; private set; }
+    public TimeOnly EndingHour { get; private set; }
 
     public Guid DoctorId { get; private set; }
-    // Reference navigation (to the "one" side) one-to-many relationship
+    
     public Doctor Doctor { get; private set; }
 
-    // Collection navigation (to the "many" side): Cada disponibilidad puede tener varios turnos
     public ICollection<TimeSlot> TimeSlots { get; private set; } = [];
 
     #region Constructor for EF
@@ -27,7 +30,7 @@ public class Availability : EntityBase
     }
 #pragma warning restore CS8618
     #endregion
-    public Availability(int month, int year, int weekDay, TimeOnly startingHour,
+    public Availability(int month, int year, DaysOfWeekEs weekDay, TimeOnly startingHour,
         TimeOnly endingHour, Doctor doctor, Guid? id = null) : base(id)
     {
         Month = month;
@@ -36,11 +39,19 @@ public class Availability : EntityBase
         StartingHour = startingHour;
         EndingHour = endingHour;
         Doctor = doctor;
-        DoctorId = doctor.Id;
     }
 
     public void AddTimeSlot(TimeSlot timeSlot)
     {
         TimeSlots.Add(timeSlot);
+    }
+
+    //metodo nuevo actualizar disponibilidad
+    public void UpdateAvailability(DaysOfWeekEs weekDay, TimeOnly startingHour, TimeOnly endingHour, Guid doctorId)
+    {
+        WeekDay = weekDay;
+        StartingHour = startingHour;
+        EndingHour = endingHour;
+        DoctorId = doctorId;
     }
 }
