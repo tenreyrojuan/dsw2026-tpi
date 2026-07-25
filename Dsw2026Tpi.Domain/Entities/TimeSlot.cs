@@ -9,7 +9,6 @@ public class TimeSlot : EntityBase
     public DateOnly Date { get; init; }
     public TimeOnly StartingTime { get; init; }
     public TimeOnly EndingTime { get; init; }
-
     public TimeSlotState TimeSlotState { get; private set; }
 
     public Guid AvailabilityId { get; private set; }
@@ -30,10 +29,10 @@ public class TimeSlot : EntityBase
         Date = date;
         StartingTime = startingTime;
         EndingTime = endingTime;
-        AvailabilityId = availability.Id;
-        Availability = availability;
         TimeSlotState = TimeSlotState.Available;
     }
+    public const int SlotDurationMinutes = 30;
+
     public void ChangeState(TimeSlotState newState)
     {
         TimeSlotState = newState;

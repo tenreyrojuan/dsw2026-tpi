@@ -31,4 +31,8 @@ public class Doctor : EntityBase
         LicenseNumber = licenseNumber;
         Speciality = speciality;
     }
+    public void UpdateDoctorAvailabilities(ICollection<Availability> availabilities)
+    {
+        Availabilities = availabilities;
+    }
 }
