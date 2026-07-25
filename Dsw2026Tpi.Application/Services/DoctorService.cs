@@ -36,15 +36,12 @@ public class DoctorService : IDoctorService
 
     public async Task<IEnumerable<DoctorAvailabilityModel.Response>> GetDoctorAvailabilities(DoctorAvailabilityModel.Request request)
     {
-        if (!request.Date.IsMonthValid() || !request.Date.IsYearValid())
-            throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR));
-        
         Doctor? doctor = await _persistence.GetById<Doctor>(request.Id)
             ?? throw new EntityNotFoundException(nameof(Doctor));
 
         Expression<Func<Availability, bool>> predicate = a => a.DoctorId == request.Id
-                                                         && a.Month == request.Date.Month 
-                                                         && a.Year == request.Date.Year;
+                                                         && a.Month == DateTime.Now.Month 
+                                                         && a.Year == DateTime.Now.Year;
         // si no hay disponibilidades, se devuelve vacio
         var availabilities = await _persistence.GetFiltered<Availability>(predicate) ?? []; 
 
@@ -52,7 +49,7 @@ public class DoctorService : IDoctorService
         return availabilities
             .OrderBy(a => a.WeekDay)
             .Select(a => new DoctorAvailabilityModel.Response(
-                nameof(a.WeekDay).ToUpper(), // Añadir comprobacion en los endpoints de availability
+                nameof(a.WeekDay).ToUpper(),
                 a.StartingHour.ToString("HH:mm"),
                 a.EndingHour.ToString("HH:mm")
                 )
@@ -77,7 +74,8 @@ public class DoctorService : IDoctorService
     {
         if (!request.Name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
-                .WithDetail(nameof(request.Name), "El nombre es invalido"); ;
+                .WithDetail(nameof(request.Name),
+                "El nombre es invalido. El campo debe tener entre 3 y 100 caracteres, y no estar vacio.");
 
         var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
         var doctor = await _persistence.GetById<Doctor>(request.Id);
@@ -89,11 +87,7 @@ public class DoctorService : IDoctorService
 
         _ = await _persistence.Update<Doctor>(doctor);
     }
-    /// <summary>
-    /// Podriamos evaluar hacer un metodo que verifique si el medico (o cualquier entidad del dominio)
-    /// existe en lugar de traer todos los campos para hacer aqui la validacion. Capaz que haya ya 
-    /// algun metodo de la persistencia que permita esto...
-    /// </summary>
+
     public async Task DeleteDoctor(Guid id)
     {
         var doctor = await _persistence.GetById<Doctor>(id) 
@@ -101,5 +95,4 @@ public class DoctorService : IDoctorService
 
         _ = await _persistence.Delete<Doctor>(doctor);
     }
-
 }
