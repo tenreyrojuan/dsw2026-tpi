@@ -42,14 +42,14 @@ public class DoctorService : IDoctorService
         Expression<Func<Availability, bool>> predicate = a => a.DoctorId == request.Id
                                                          && a.Month == DateTime.Now.Month 
                                                          && a.Year == DateTime.Now.Year;
-        // si no hay disponibilidades, se devuelve vacio
-        var availabilities = await _persistence.GetFiltered<Availability>(predicate) ?? []; 
 
+        var availabilities = await _persistence.GetFiltered<Availability>(predicate); 
         
-        return availabilities
+        return availabilities is null? [] : 
+            availabilities
             .OrderBy(a => a.WeekDay)
             .Select(a => new DoctorAvailabilityModel.Response(
-                nameof(a.WeekDay).ToUpper(),
+                a.WeekDay.ToString().ToUpper(), // nameof(a.WeekDay) devuelve el valor literal WeekDay
                 a.StartingHour.ToString("HH:mm"),
                 a.EndingHour.ToString("HH:mm")
                 )
