@@ -15,6 +15,7 @@ public static class DependencyInjectionConfigurationExtensions
         services.AddScoped<ISpecialityService, SpecialityService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<ISignInService, SignInService>();
+        services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddSingleton<JwtService>();
         return services;
     }
