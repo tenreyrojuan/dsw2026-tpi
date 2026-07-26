@@ -32,9 +32,9 @@ public class DoctorController : AppController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> GetDoctorAvailabilities([FromRoute] Guid id, [FromQuery]DateOnly date)
+    public async Task<IActionResult> GetDoctorAvailabilities([FromRoute] Guid id)
     {
-        DoctorAvailabilityModel.Request request = new(id, date);
+        DoctorAvailabilityModel.Request request = new(id);
         var availabilities = await _service.GetDoctorAvailabilities(request);
         return Ok(availabilities);
     }
