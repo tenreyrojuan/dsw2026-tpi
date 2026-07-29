@@ -32,15 +32,49 @@ public class Availability : EntityBase
         Doctor = doctor;
     }
 
-    public void AddTimeSlot(TimeSlot timeSlot)
-    {
-        TimeSlots.Add(timeSlot);
-    }
-
     public void UpdateAvailability(DayOfWeek weekDay, TimeOnly startingHour, TimeOnly endingHour, Guid doctorId)
     {
         WeekDay = weekDay;
         StartingHour = startingHour;
         EndingHour = endingHour;
+    }
+
+    public bool HasOverlappingSchedules(TimeOnly startingHour, TimeOnly endingHour)
+    {
+        return startingHour < EndingHour && StartingHour < endingHour;
+    }
+
+    public void GenerateMonthlyTimeSlots(int startingDay) 
+    {
+        var date = new DateOnly(Year, Month, startingDay);
+        //busca el primer dia del mes que coincida con el dia de semana presente en el array del request
+        while (date.DayOfWeek != WeekDay)
+        {
+            date = date.AddDays(1);
+            if (date.Month != Month) return;
+        }
+        //crea los turnos diarios para el dia solicitado, saltando de a 7 dias hasta que termina el mes.
+        while (date.Month == Month)
+        {
+            CreateDailyTimeSlots(date);
+            date = date.AddDays(7);
+        }
+    }
+
+    private void CreateDailyTimeSlots(DateOnly date)
+    {
+        var currentStart = StartingHour;
+
+        while (currentStart < EndingHour)
+        {
+            var currentEnd = currentStart.AddMinutes(TimeSlot.SlotDurationMinutes);
+
+            if (currentEnd > EndingHour)
+                break;
+
+            TimeSlots.Add(new TimeSlot(date, currentStart, currentEnd, this));
+
+            currentStart = currentEnd;
+        }
     }
 }
