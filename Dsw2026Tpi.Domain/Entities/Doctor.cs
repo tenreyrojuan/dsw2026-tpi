@@ -9,6 +9,8 @@ public class Doctor : EntityBase
 
     public ICollection<Availability> Availabilities { get; private set; } = [];
 
+    public bool IsActive { get; private set; } = true;
+
     #region Constructor for EF
 #pragma warning disable CS8618
     private Doctor()
@@ -17,6 +19,11 @@ public class Doctor : EntityBase
 #pragma warning restore CS8618
     #endregion
 
+    public void Deactivate()
+    {
+        IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
+    }
     public Doctor(string name, string licenseNumber, Speciality speciality, Guid? id = null) : base(id)
     {
         Name = name;
