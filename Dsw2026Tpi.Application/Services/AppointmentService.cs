@@ -23,31 +23,40 @@ public class AppointmentService : IAppointmentService
 
     public async Task AddAppointment(AppointmentModel.Request request)
     {
-        var doctor = await _persistence.GetById<Doctor>(request.DoctorId);
-        if (doctor == null)
-            throw new Exception("El doctor elegido no existe");
-
-        var availability = await _persistence.GetById<Availability>(request.AvailabilityId);
-
-        if (availability == null)
-            throw new Exception("El turno elegido no existe");
-
-        var existingAppointment = await _persistence.First<Appointment>(a => a.PatientId == request.AvailabilityId);
-        if (existingAppointment != null)
-            throw new Exception("Este turno ya fue reservado por otro paciente");
-
-        var dni = request.Patient.Dni.ToString();
+        var dni = request.Patient.Dni;
         if (dni.Length < 7 || dni.Length > 10)
-            throw new ArgumentException("El DNI debe tener entre 7 y 10 digitos");
+            throw new ValidationException();
 
         if (string.IsNullOrWhiteSpace(request.Reason) || request.Reason.Length < 5)
-            throw new ArgumentException("la razon debe tener al menos 5 caracteres.");
+            throw new ValidationException();
+
+        var doctor = await _persistence.GetById<Doctor>(request.DoctorId)
+            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND);
+
+        var patient = await _persistence.First<Patient>(p => p.Dni == dni)
+            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND);
+
+        var timeSlot = await _persistence.GetById<TimeSlot>(request.TimeSlotId)
+            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND);
+
+        var hoy = DateOnly.FromDateTime(DateTime.Now);
+        if (timeSlot.Date < hoy)
+            throw new BusinessRuleException(ErrorCodes.BUSINESS_ERROR, nameof(ErrorCodes.BUSINESS_ERROR));
+
+        var existingAppointment = await _persistence.First<Appointment>(a =>
+            a.TimeSlotId == request.TimeSlotId &&
+            a.TimeSlot.TimeSlotState == TimeSlotState.AVAILABLE);
+        if (existingAppointment != null)
+            throw new BusinessRuleException(ErrorCodes.BUSINESS_ERROR, "El slot de tiempo ya está reservado.");
+
+        var newAppointment = new Appointment(patient, timeSlot, request.Reason);
+        _ = await _persistence.Add<Appointment>(newAppointment); 
     }
 
     public async Task<IEnumerable<AppointmentModel.Response>> GetPatientAppointment(string dni)
     {
         var appointment = await _persistence.GetFiltered<Appointment>(
-            a => a.Patient.Dni == dni && a.IsActive && a.AppointmentState == AppointmentState.Completed, 
+            a => a.Patient.Dni == dni && a.AppointmentState == AppointmentState.ATTENDED, 
             nameof (Patient), nameof(TimeSlot));
         
         return appointment is null ? [] : 
