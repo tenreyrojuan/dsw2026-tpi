@@ -11,7 +11,8 @@ public class SpecialityConfiguration : IEntityTypeConfiguration<Speciality>
         builder.ToTable("Specialities");
         builder.HasKey(e => e.Id);
 
-        builder.Property(e => e.IsActive).HasDefaultValue(true);
+        builder.Property(e => e.Deleted).HasDefaultValue(false);
+        builder.HasQueryFilter(e => !e.Deleted);
 
         builder.Property(e => e.Name).HasMaxLength(100).IsRequired();
         builder.HasIndex(e => e.Name).IsUnique();

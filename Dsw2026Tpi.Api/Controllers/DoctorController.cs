@@ -43,9 +43,8 @@ public class DoctorController : AppController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AddDoctor([FromBody] DoctorApiModel.Request apiRequest) 
+    public async Task<IActionResult> AddDoctor([FromBody] DoctorModel.Request request) 
     {
-        DoctorModel.Request request = new(apiRequest.Name, apiRequest.LicenseNumber, apiRequest.SpecialityId);
         await _service.AddDoctor(request);
         return Ok();
     }
@@ -54,9 +53,8 @@ public class DoctorController : AppController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateDoctor([FromRoute]Guid id, [FromBody] DoctorApiModel.Request apiRequest)
+    public async Task<IActionResult> UpdateDoctor([FromRoute]Guid id, [FromBody] DoctorUpdateModel.Request request)
     {
-        DoctorUpdateModel.Request request = new(id, apiRequest.Name, apiRequest.LicenseNumber, apiRequest.SpecialityId);
         await _service.UpdateDoctor(request);
         return Ok();
     }

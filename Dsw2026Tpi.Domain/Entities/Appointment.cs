@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Dsw2026Tpi.Domain.Entities;
+﻿namespace Dsw2026Tpi.Domain.Entities;
 //Cita
 public class Appointment : EntityBase
 {
@@ -30,18 +26,18 @@ public class Appointment : EntityBase
         Patient = patient;
         TimeSlot = timeSlot;
         Reason = reason;
-        AppointmentState = AppointmentState.Confirmed;
+        AppointmentState = AppointmentState.BOOKED;
     }
 
     public void Cancel()
     {
-        AppointmentState = AppointmentState.Canceled;
+        AppointmentState = AppointmentState.CANCELED;
         CancelledAt = DateTime.UtcNow;
     }
     
     public void Complete()
     {
-        AppointmentState = AppointmentState.Completed;
+        AppointmentState = AppointmentState.ATTENDED;
         AttendedAt = DateTime.UtcNow;
     }
 }
