@@ -28,7 +28,6 @@ public class SpecialityController : AppController
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddSpeciality([FromBody] SpecialityModel.Request request)
     {
         await _service.AddSpeciality(request.Name, request.Description);
