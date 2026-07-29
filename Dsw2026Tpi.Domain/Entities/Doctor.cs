@@ -24,11 +24,10 @@ public class Doctor : EntityBase
         Speciality = speciality;
     }
 
-    //metodo nuevo actualizar medicos
-    public void UpdateDoctor(string name, string licenseNumber, Speciality speciality)
+    public void UpdateDoctor(string name, string licenseNumber, Guid? specialityId)
     {
         Name = name;
         LicenseNumber = licenseNumber;
-        Speciality = speciality;
+        SpecialityId = specialityId;
     }
 }
