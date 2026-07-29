@@ -30,16 +30,6 @@ public class AuthenticationService : IAuthenticationService
         _jwtService = jwtService;
         _logger = logger;
     }
-    /// <summary>
-    /// Estamos haciendo dos cosas aca. Estamos validando los datos de la request y 
-    /// ademas estamos haciendo la verificacion de usuario. Deberiamos desacoplar 
-    /// el servicio de autenticacion de la validacion de los campos provenientes 
-    /// de la Api?
-    /// 
-    /// Ademas el servicio esta recibiendo nuevamente la request. Deberiamos desacoplar los
-    /// servicios de los DTOs
-    /// </summary>
-
     public async Task<LoginAdminModel.Response> LoginAdmin(LoginAdminModel.Request request)
     {
         if (!request.Email.IsEmailValid()) throw new AuthenticationException();
