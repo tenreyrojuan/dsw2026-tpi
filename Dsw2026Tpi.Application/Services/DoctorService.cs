@@ -42,11 +42,11 @@ public class DoctorService : IDoctorService
         Expression<Func<Availability, bool>> predicate = a => a.DoctorId == request.Id
                                                          && a.Month == DateTime.Now.Month 
                                                          && a.Year == DateTime.Now.Year;
-        // si no hay disponibilidades, se devuelve vacio
-        var availabilities = await _persistence.GetFiltered<Availability>(predicate) ?? []; 
+        var availabilities = await _persistence.GetFiltered<Availability>(predicate);
 
-        
-        return availabilities
+        // si no hay disponibilidades, se devuelve una lista vacia
+        return availabilities is null ? [] :
+            availabilities
             .OrderBy(a => a.WeekDay)
             .Select(a => new DoctorAvailabilityModel.Response(
                 nameof(a.WeekDay).ToUpper(),
@@ -77,13 +77,13 @@ public class DoctorService : IDoctorService
                 .WithDetail(nameof(request.Name),
                 "El nombre es invalido. El campo debe tener entre 3 y 100 caracteres, y no estar vacio.");
 
-        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
-        var doctor = await _persistence.GetById<Doctor>(request.Id);
+        var doctor = await _persistence.GetById<Doctor>(request.Id,nameof(Speciality));        
+        var speciality = await _persistence.GetById<Speciality>(request.Id);
 
         if (speciality is null || doctor is null)
             throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND);
 
-        doctor.UpdateDoctor(request.Name, request.LicenseNumber, speciality);
+        doctor.UpdateDoctor(request.Name, request.LicenseNumber, request.SpecialityId);
 
         _ = await _persistence.Update<Doctor>(doctor);
     }
