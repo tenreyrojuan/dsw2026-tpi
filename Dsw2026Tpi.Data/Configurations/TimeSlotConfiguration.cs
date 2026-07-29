@@ -13,7 +13,8 @@ public class TimeSlotConfiguration : IEntityTypeConfiguration<TimeSlot>
 
         builder.HasKey(t => t.Id);
 
-        builder.Property(t => t.IsActive).HasDefaultValue(true);
+        builder.Property(t => t.Deleted).HasDefaultValue(false);
+        builder.HasQueryFilter(t => !t.Deleted);
 
         builder.Property(t => t.Date).IsRequired();
         builder.Property(t => t.StartingTime).IsRequired();

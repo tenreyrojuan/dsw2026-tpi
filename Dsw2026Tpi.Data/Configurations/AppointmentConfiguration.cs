@@ -11,7 +11,8 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
         builder.ToTable("Appointments");
         builder.HasKey(a => a.Id);
 
-        builder.Property(a => a.IsActive).HasDefaultValue(true);
+        builder.Property(a => a.Deleted).HasDefaultValue(false);
+        builder.HasQueryFilter(a => !a.Deleted);
 
         builder.Property(a => a.Reason).HasMaxLength(100).IsRequired();
 
