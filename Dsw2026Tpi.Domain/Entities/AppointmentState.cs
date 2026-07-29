@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Dsw2026Tpi.Domain.Entities;
+﻿namespace Dsw2026Tpi.Domain.Entities;
 //Estado de Cita
 public enum AppointmentState
 {
-    Confirmed = 1,
-    Canceled,
-    Completed,
+    BOOKED = 1,
+    ATTENDED,
+    CANCELED,
+    NO_SHOW,
 }
