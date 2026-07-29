@@ -11,7 +11,8 @@ public class PatientConfiguration : IEntityTypeConfiguration<Patient>
         builder.ToTable("Patients");
         builder.HasKey(p => p.Id);
 
-        builder.Property(p => p.IsActive).HasDefaultValue(true);
+        builder.Property(p => p.Deleted).HasDefaultValue(false);
+        builder.HasQueryFilter(p => !p.Deleted);
 
         builder.Property(p => p.Dni).HasMaxLength(10).IsRequired();
         builder.HasIndex(p => p.Dni).IsUnique();

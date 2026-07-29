@@ -18,12 +18,6 @@ public class DoctorService : IDoctorService
     {
         _persistence = persistence;
     }
-    /// <summary>
-    /// Lo mismo que en el AutenticationService. Estamos validando los datos de la request y 
-    /// ademas estamos haciendo las operaciones de los medicos. Deberiamos desacoplar 
-    /// el servicio de Doctores de la validacion de los campos provenientes 
-    /// de la Api?
-    /// </summary>
     public async Task<Pagination<DoctorModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
         var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, 
@@ -42,9 +36,10 @@ public class DoctorService : IDoctorService
         Expression<Func<Availability, bool>> predicate = a => a.DoctorId == request.Id
                                                          && a.Month == DateTime.Now.Month 
                                                          && a.Year == DateTime.Now.Year;
-
+                                                         
         var availabilities = await _persistence.GetFiltered<Availability>(predicate); 
         
+        // si no hay disponibilidades, se devuelve una lista vacia
         return availabilities is null? [] : 
             availabilities
             .OrderBy(a => a.WeekDay)
@@ -60,8 +55,7 @@ public class DoctorService : IDoctorService
     {
         if (!request.Name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
-                .WithDetail(nameof(request.Name),
-                "El nombre es invalido. El campo debe tener entre 3 y 100 caracteres, y no estar vacio.");
+                .WithDetail(nameof(request.Name),ValidationErrors.INVALID_NAME);
         
         var speciality = await _persistence.First<Speciality>(s => s.Id == request.SpecialityId) 
             ?? throw new EntityNotFoundException(nameof(Speciality));
@@ -74,16 +68,15 @@ public class DoctorService : IDoctorService
     {
         if (!request.Name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
-                .WithDetail(nameof(request.Name),
-                "El nombre es invalido. El campo debe tener entre 3 y 100 caracteres, y no estar vacio.");
+                .WithDetail(nameof(request.Name),ValidationErrors.INVALID_NAME);
 
-        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
-        var doctor = await _persistence.GetById<Doctor>(request.Id);
+        var doctor = await _persistence.GetById<Doctor>(request.Id,nameof(Speciality));        
+        var speciality = await _persistence.GetById<Speciality>(request.Id);
 
         if (speciality is null || doctor is null)
             throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND);
 
-        doctor.UpdateDoctor(request.Name, request.LicenseNumber, speciality);
+        doctor.UpdateDoctor(request.Name, request.LicenseNumber, request.SpecialityId);
 
         _ = await _persistence.Update<Doctor>(doctor);
     }

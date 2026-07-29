@@ -29,8 +29,7 @@ public class SpecialityService : ISpecialityService
     {
         if (!name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
-                .WithDetail(nameof(name),
-                "El nombre es invalido. El campo debe tener entre 3 y 100 caracteres, y no estar vacio.");
+                .WithDetail(nameof(name),ValidationErrors.INVALID_NAME);
 
         var speciality= new Speciality(name, description);
         _ = await _persistence.Add<Speciality>(speciality);
@@ -40,7 +39,7 @@ public class SpecialityService : ISpecialityService
     {
         if (!name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
-                .WithDetail(nameof(name), "El nombre es invalido");
+                .WithDetail(nameof(name),ValidationErrors.INVALID_NAME);
 
         var speciality = await _persistence.GetById<Speciality>(id)
             ?? throw new EntityNotFoundException(nameof(Speciality));

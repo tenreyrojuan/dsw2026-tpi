@@ -13,6 +13,9 @@ public class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
 
         builder.Property(d => d.IsActive).HasDefaultValue(true);
 
+        builder.Property(d => d.Deleted).HasDefaultValue(false);
+        builder.HasQueryFilter(d => !d.Deleted);
+
         builder.Property(d => d.Name).HasMaxLength(100).IsRequired();
 
         builder.Property(d => d.LicenseNumber).HasMaxLength(20).IsRequired();
