@@ -11,10 +11,5 @@ public record DoctorModel
 }
 public record DoctorAvailabilityModel
 {
-    public record Request(Guid Id);
     public record Response(string Day, string StartTime, string EndTime);
-}
-public record DoctorUpdateModel
-{
-    public record Request(Guid Id,string Name, string LicenseNumber, Guid SpecialityId);
 }
