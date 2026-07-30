@@ -44,7 +44,7 @@ public class Availability : EntityBase
         return startingHour < EndingHour && StartingHour < endingHour;
     }
 
-    public void GenerateMonthlyTimeSlots(int startingDay) 
+    public void GenerateMonthlyTimeSlots(int startingDay)
     {
         var date = new DateOnly(Year, Month, startingDay);
         //busca el primer dia del mes que coincida con el dia de semana presente en el array del request
