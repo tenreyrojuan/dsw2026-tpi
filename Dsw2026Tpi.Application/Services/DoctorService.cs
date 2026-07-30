@@ -64,13 +64,13 @@ public class DoctorService : IDoctorService
         _ = await _persistence.Add<Doctor>(doctor);
     }
 
-    public async Task UpdateDoctor(DoctorModel.Request request)
+    public async Task UpdateDoctor(Guid doctorId,DoctorModel.Request request)
     {
         if (!request.Name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
                 .WithDetail(nameof(request.Name),ValidationErrors.INVALID_NAME);
 
-        var doctor = await _persistence.GetById<Doctor>(request.Id,nameof(Speciality));        
+        var doctor = await _persistence.GetById<Doctor>(doctorId, nameof(Speciality));        
         var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
 
         if (speciality is null || doctor is null)
@@ -81,9 +81,9 @@ public class DoctorService : IDoctorService
         _ = await _persistence.Update<Doctor>(doctor);
     }
 
-    public async Task DeleteDoctor(Guid id)
+    public async Task DeleteDoctor(Guid doctorId)
     {
-        var doctor = await _persistence.GetById<Doctor>(id) 
+        var doctor = await _persistence.GetById<Doctor>(doctorId) 
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND);
 
         _ = await _persistence.Delete<Doctor>(doctor);
