@@ -7,7 +7,6 @@ public class Appointment : EntityBase
     public DateTime? AttendedAt { get; private set; }
     public DateTime? CancelledAt{ get; private set; }
     public AppointmentState AppointmentState { get; private set; }
-    
     public Guid PatientId { get; init; }
     public Guid TimeSlotId { get; init; }
     public Patient Patient { get; private set; }
@@ -26,7 +25,7 @@ public class Appointment : EntityBase
         Patient = patient;
         TimeSlot = timeSlot;
         Reason = reason;
-        AppointmentState = AppointmentState.BOOKED;
+        AppointmentState = AppointmentState.ATTENDED;
     }
 
     public void Cancel()

@@ -1,0 +1,14 @@
+﻿using Dsw2026Tpi.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Dsw2026Tpi.Application.Dtos;
+
+public record AppointmentModel
+{
+    public record Request(Guid DoctorId, Guid TimeSlotId, PatientDto Patient, string Reason);
+    public record Response(string Name, DateOnly Date, TimeOnly StartingTime);
+    public record PatientDto(string Dni);
+    
+}
