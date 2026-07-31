@@ -66,8 +66,8 @@ public class AuthenticationService : IAuthenticationService
         {
             UserName = request.Email,
             Email = request.Email,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
