@@ -25,7 +25,7 @@ public class Appointment : EntityBase
         Patient = patient;
         TimeSlot = timeSlot;
         Reason = reason;
-        AppointmentState = AppointmentState.ATTENDED;
+        AppointmentState = AppointmentState.BOOKED;
     }
 
     public void Cancel()
