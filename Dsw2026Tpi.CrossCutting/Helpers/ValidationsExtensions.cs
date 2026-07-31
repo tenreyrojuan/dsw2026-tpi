@@ -15,12 +15,12 @@ public static class ValidationsExtensions
         return !string.IsNullOrWhiteSpace(name) &&
             (name.Length >= 3 && name.Length <= 100);
     }
-    public static bool IsMonthValid(this DateOnly month)
+    public static bool IsDniValid(this string dni)
     {
-        return month.Month >= 1 && month.Month <= 12;
+        return dni.Length < 7 || dni.Length > 10;
     }
-    public static bool IsYearValid(this DateOnly year)
+    public static bool IsReasonValid(this string? reason)
     {
-        return year.Year.Equals(DateTime.Now.Year);
+        return string.IsNullOrWhiteSpace(reason) || reason.Length < 5;
     }
 }
