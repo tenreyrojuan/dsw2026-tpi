@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dsw2026Tpi.Api.Controllers;
 
 [Route("api/appointment")]
-[Authorize(Policy = Policies.AdminPolicy)]
+[Authorize(Policy = Policies.PatientPolicy)]
 public class AppointmentController : AppController
 {
     private readonly IAppointmentService _service;
