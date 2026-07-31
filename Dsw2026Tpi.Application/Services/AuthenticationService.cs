@@ -6,6 +6,7 @@ using Dsw2026Tpi.CrossCutting.Identity;
 using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Data.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Dsw2026Tpi.Application.Services;
@@ -52,9 +53,50 @@ public class AuthenticationService : IAuthenticationService
         );
     }
 
-    public async Task<LoginPatientModel.Response> LoginPatient(LoginPatientModel.Response request)
+    public async Task<LoginPatientModel.Response> LoginPatient(LoginPatientModel.Request request)
     {
-        throw new NotImplementedException();
+        if (!request.Email.IsEmailValid()) throw new AuthenticationException();
+        var dni = request.Dni.ToString();
+        if (dni.Length < 7 || dni.Length > 8)
+            throw new AuthenticationException();
+
+        var user = await _userManager.FindByEmailAsync(request.Email);
+
+        if (user == null)
+        {
+            var userExist = await _userManager.Users.AnyAsync(u => u.Dni == request.Dni);
+            if (userExist)
+                throw new Exception("ya existe DNI");
+
+            user = new ApplicationUser
+            {
+                UserName = request.Email,
+                Email = request.Email,
+                Dni = request.Dni,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var result = await _userManager.CreateAsync(user);
+            if (!result.Succeeded)
+            {
+                _logger.LogError("Error al crear el paciente con Email: {Email}", request.Email);
+                throw new AuthenticationException();
+            }
+
+            _ = await _userManager.AddToRoleAsync(user, Roles.Patient);
+        }
+
+        if (user.Dni != request.Dni)
+            throw new AuthenticationException();//Contraseña Incorrecta
+        var role = Roles.Patient;
+
+        var token = _jwtService.GenerateToken(user.UserName!, role);
+
+        return new LoginPatientModel.Response(
+            token,
+            role
+        );
     }
 
     public async Task<RegisterModel.Response> Register(RegisterModel.Request request)
@@ -75,7 +117,7 @@ public class AuthenticationService : IAuthenticationService
         if (!result.Succeeded) throw new ConflictException(nameof(ErrorCodes.REGISTER_USER_CONFLICT),
             ErrorCodes.REGISTER_USER_CONFLICT)
                 .WithDetail(result.Errors.Select(e => (e.Code, e.Description)));
-       
+
         _ = await _userManager.AddToRoleAsync(user, Roles.Administrator);
 
         _logger.LogInformation("Usuario registrado: {Email}", request.Email);
