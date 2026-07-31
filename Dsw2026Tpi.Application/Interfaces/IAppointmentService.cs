@@ -7,7 +7,7 @@ namespace Dsw2026Tpi.Application.Interfaces;
 
 public interface IAppointmentService
 {
-    Task AddAppointment (AppointmentModel.Request request);
+    Task<AppointmentModel.Response> AddAppointment (AppointmentModel.Request request);
     Task<IEnumerable<AppointmentModel.Response>> GetPatientAppointment(string dni);
-    Task DeleteAppointment(Guid id);
+    Task<AppointmentModel.Response> DeleteAppointment(Guid id);
 }
