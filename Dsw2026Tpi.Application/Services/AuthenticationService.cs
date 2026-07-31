@@ -5,6 +5,8 @@ using Dsw2026Tpi.CrossCutting.Helpers;
 using Dsw2026Tpi.CrossCutting.Identity;
 using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Data.Identity;
+using Dsw2026Tpi.Domain.Entities;
+using Dsw2026Tpi.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,18 +20,21 @@ public class AuthenticationService : IAuthenticationService
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly JwtService _jwtService;
     private readonly ILogger<AuthenticationService> _logger;
+    private readonly IPersistence _persistence;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         ISignInService signInManager,
         RoleManager<IdentityRole> roleManager,
         JwtService jwtService,
-        ILogger<AuthenticationService> logger)
+        ILogger<AuthenticationService> logger,
+        IPersistence persistence)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _roleManager = roleManager;
         _jwtService = jwtService;
         _logger = logger;
+        _persistence = persistence;
     }
     public async Task<LoginAdminModel.Response> LoginAdmin(LoginAdminModel.Request request)
     {
@@ -84,11 +89,21 @@ public class AuthenticationService : IAuthenticationService
                 throw new AuthenticationException();
             }
 
+            var patient = new Patient(dni, request.Email);
+            var newPatient = await _persistence.Add<Patient>(patient);
+            if (newPatient is null)
+            {
+                _logger.LogError("Error al crear el paciente con Email: {Email}", request.Email);
+                throw new Exception();
+            }
             _ = await _userManager.AddToRoleAsync(user, Roles.Patient);
         }
 
         if (user.Dni != request.Dni)
-            throw new AuthenticationException();//Contraseña Incorrecta
+        {
+            _logger.LogError("Error al crear el paciente con Email: {Email}", request.Email);
+            throw new AuthenticationException();
+        }
         var role = Roles.Patient;
 
         var token = _jwtService.GenerateToken(user.UserName!, role);
