@@ -23,8 +23,8 @@ public class AppointmentController : AppController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddAppointment([FromBody]AppointmentModel.Request request)
     {
-        await _service.AddAppointment(request);
-        return Ok();
+        var result = await _service.AddAppointment(request);
+        return Ok(result);
     }
 
     [HttpGet]
@@ -42,7 +42,7 @@ public class AppointmentController : AppController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSpeciality([FromRoute] Guid id)
     {
-        await _service.DeleteAppointment(id);
-        return Ok();
+        var result = await _service.DeleteAppointment(id);
+        return Ok(result);
     }
 }

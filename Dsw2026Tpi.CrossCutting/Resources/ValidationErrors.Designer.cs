@@ -68,5 +68,14 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
                 return ResourceManager.GetString("INVALID_NAME", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El espacio de tiempo ya está reservado..
+        /// </summary>
+        public static string SLOT_ALREADY_TAKEN {
+            get {
+                return ResourceManager.GetString("SLOT_ALREADY_TAKEN", resourceCulture);
+            }
+        }
     }
 }

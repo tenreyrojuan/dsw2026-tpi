@@ -31,12 +31,12 @@ public class Appointment : EntityBase
     public void Cancel()
     {
         AppointmentState = AppointmentState.CANCELED;
-        CancelledAt = DateTime.UtcNow;
+        CancelledAt = DateTime.Now;
     }
     
     public void Complete()
     {
         AppointmentState = AppointmentState.ATTENDED;
-        AttendedAt = DateTime.UtcNow;
+        AttendedAt = DateTime.Now;
     }
 }
