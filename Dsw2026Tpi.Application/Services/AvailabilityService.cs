@@ -4,6 +4,8 @@ using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
+using System.Numerics;
+using static Dsw2026Tpi.Application.Dtos.AvailabilityModel;
 
 namespace Dsw2026Tpi.Application.Services;
 
@@ -15,57 +17,95 @@ public class AvailabilityService : IAvailabilityService
         _persistence = persistence;
     }
 
-    public async Task AddAvailability(AvailabilityModel.Request request)
+    public async Task<AvailabilityModel.Response> AddAvailability(AvailabilityModel.Request request)
     {
-        await CUAvailability(request, isUpdate: false);
-    }
-
-    public async Task UpdateAvailability(AvailabilityModel.Request request)
-    {
-        await CUAvailability(request, isUpdate: true);
-    }
-    private async Task CUAvailability(AvailabilityModel.Request request, bool isUpdate)
-    {
-        Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId)
-    ?? throw new EntityNotFoundException(nameof(Doctor));
+        Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.Availabilities))
+            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND);
 
         var now = DateTime.Now;
         var currentMonth = now.Month;
         var currentYear = now.Year;
 
-        var existingAvailabilities = (await _persistence.GetFiltered<Availability>(
-                a => a.DoctorId == request.DoctorId && a.Month == currentMonth && a.Year == currentYear))?.ToList() ?? new List<Availability>();
+        ICollection<Availability> finalAvailabilities = CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear,now);
+        
+        var disps = await _persistence.AddRange(finalAvailabilities);
 
-        if (isUpdate)
-        {
-            foreach (var existing in existingAvailabilities)
-            {
-                await _persistence.Delete(existing);
-            }
-            existingAvailabilities.Clear();
-        }
+        return new AvailabilityModel.Response(doctor.Id,
+            disps.Select(a => 
+            new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));
+    }
 
-        foreach (var day in request.Days)
+    public async Task<AvailabilityModel.Response> UpdateAvailability(AvailabilityModel.Request request)
+    {
+        Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.Availabilities))
+            ?? throw new EntityNotFoundException(nameof(Doctor));
+
+        var now = DateTime.Now;
+        var currentMonth = now.Month;
+        var currentYear = now.Year;
+
+        var availabilitiesToKeep = doctor.Availabilities
+            .Where(a => a.Month != currentMonth || a.Year != currentYear)
+            .ToArray();
+
+        doctor.UpdateDoctorAvailabilities(availabilitiesToKeep);
+
+        ICollection<Availability> finalAvailabilities = 
+            CreateFinalAvailabilities(request.Days,doctor,currentMonth,currentYear,now);
+        
+        var updatedDoctor = await _persistence.Update(doctor);
+
+        return new AvailabilityModel.Response(updatedDoctor.Id,
+            finalAvailabilities.Select(a => new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));
+
+    }
+    private ICollection<Availability> CreateFinalAvailabilities(
+        IEnumerable<AvailabilityModel.DayScheduleRequest> days,
+        Doctor doctor,
+        int currentMonth, int currentYear,
+        DateTime now)
+    {
+        List<Availability> createdAvailabilities = new List<Availability>();
+        foreach (var day in days)
         {
             if (day.StartTime >= day.EndTime)
                 throw new BusinessRuleException(ErrorCodes.BUSINESS_ERROR, "startTime debe ser antes que endTime!");
 
-            var weekDay = Enum.Parse<DayOfWeek>(day.Day, true); // se reciben los dias en ingles, el true indica que es case insensitive
+            DayOfWeek weekDay = ParseDayOfWeek(day.Day);
 
-            bool hasOverlap = existingAvailabilities.Any(a =>
+            bool hasOverlap = doctor.Availabilities.Any(a =>
+            a.Month == currentMonth &&
+            a.Year == currentYear &&
             a.WeekDay == weekDay &&
-            day.StartTime < a.EndingHour &&
-            day.EndTime > a.StartingHour);
+            a.HasOverlappingSchedules(day.StartTime, day.EndTime));
 
             if (hasOverlap)
-                throw new BusinessRuleException(ErrorCodes.BUSINESS_ERROR, "se ha detectado un solapamiento de horarios");
+                throw new ConflictException(ErrorCodes.BUSINESS_ERROR, "se ha detectado un solapamiento de horarios");
 
             var availability = new Availability(currentMonth, currentYear, weekDay, day.StartTime, day.EndTime, doctor);
 
             availability.GenerateMonthlyTimeSlots(now.Day);
-            await _persistence.Add(availability);
 
-            existingAvailabilities.Add(availability);
+            createdAvailabilities.Add(availability);
         }
+        return createdAvailabilities;
     }
+    private static DayOfWeek ParseDayOfWeek(string day)
+    {
+        if (Enum.TryParse<DayOfWeek>(day, true, out var weekDay))
+            return weekDay;
+
+        return day.ToLower() switch
+        {
+            "domingo" => DayOfWeek.Sunday,
+            "lunes" => DayOfWeek.Monday,
+            "martes" => DayOfWeek.Tuesday,
+            "miercoles" or "miércoles" => DayOfWeek.Wednesday,
+            "jueves" => DayOfWeek.Thursday,
+            "viernes" => DayOfWeek.Friday,
+            "sabado" or "sábado" => DayOfWeek.Saturday,
+            _ => throw new ArgumentException($"Día inválido: {day}")
+        };
+    }
+
 }
