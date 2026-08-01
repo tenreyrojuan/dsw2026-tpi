@@ -22,5 +22,6 @@ public sealed class Speciality : EntityBase
     {
         Name = name;
         Description = description;
+        UpdateTimestamp();
     }
 }

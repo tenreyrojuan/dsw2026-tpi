@@ -32,11 +32,13 @@ public sealed class Appointment : EntityBase
     {
         AppointmentState = AppointmentState.CANCELLED;
         CancelledAt = DateTime.Now;
+        UpdateTimestamp();
     }
     
     public void Complete()
     {
         AppointmentState = AppointmentState.ATTENDED;
         AttendedAt = DateTime.Now;
+        UpdateTimestamp();
     }
 }

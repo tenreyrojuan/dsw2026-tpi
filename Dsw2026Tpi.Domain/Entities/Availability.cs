@@ -37,6 +37,7 @@ public sealed class Availability : EntityBase
         WeekDay = weekDay;
         StartingHour = startingHour;
         EndingHour = endingHour;
+        UpdateTimestamp();
     }
 
     public bool HasOverlappingSchedules(TimeOnly startingHour, TimeOnly endingHour)

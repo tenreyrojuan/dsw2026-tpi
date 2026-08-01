@@ -34,10 +34,12 @@ public sealed class TimeSlot : EntityBase
     public void ChangeState(TimeSlotState newState)
     {
         TimeSlotState = newState;
+        UpdateTimestamp();
     }
     public void Book(Appointment appointment)
     {
         Appointment = appointment;
         TimeSlotState = TimeSlotState.BOOKED;
+        UpdateTimestamp();
     }
 }

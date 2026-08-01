@@ -22,7 +22,7 @@ public sealed class Doctor : EntityBase
     public void Deactivate()
     {
         IsActive = false;
-        UpdatedAt = DateTime.Now;
+        UpdateTimestamp();
     }
     public Doctor(string name, string licenseNumber, Speciality speciality, Guid? id = null) : base(id)
     {
@@ -36,6 +36,7 @@ public sealed class Doctor : EntityBase
         Name = name;
         LicenseNumber = licenseNumber;
         SpecialityId = specialityId;
+        UpdateTimestamp();
     }
     public void UpdateDoctorAvailabilities(ICollection<Availability> availabilities)
     {
