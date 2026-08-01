@@ -1,6 +1,6 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 //Turno
-public class TimeSlot : EntityBase
+public sealed class TimeSlot : EntityBase
 {
     public DateOnly Date { get; private set; }
     public TimeOnly StartingTime { get; private set; }

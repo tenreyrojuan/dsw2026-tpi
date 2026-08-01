@@ -1,6 +1,6 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 //Cita
-public class Appointment : EntityBase
+public sealed class Appointment : EntityBase
 {
     public string Reason { get; private set; }
 

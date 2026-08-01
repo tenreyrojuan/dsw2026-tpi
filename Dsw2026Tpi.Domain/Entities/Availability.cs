@@ -1,6 +1,6 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 //Disponibilidad
-public class Availability : EntityBase
+public sealed class Availability : EntityBase
 {
     public int Month { get; init; }
     public int Year { get; init; }

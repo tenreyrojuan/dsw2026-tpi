@@ -1,6 +1,6 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 
-public class Patient : EntityBase
+public sealed class Patient : EntityBase
 {
     public string Dni { get; init; }
     public string Name { get; init; }
