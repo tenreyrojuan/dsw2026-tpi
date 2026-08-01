@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
-[Route("doctors")]
+[Route("api/doctors")]
 [Authorize(Policy = Policies.AdminPolicy)]
 public class DoctorController : AppController
 {
@@ -34,8 +34,7 @@ public class DoctorController : AppController
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> GetDoctorAvailabilities([FromRoute] Guid id)
     {
-        DoctorAvailabilityModel.Request request = new(id);
-        var availabilities = await _service.GetDoctorAvailabilities(request);
+        var availabilities = await _service.GetDoctorAvailabilities(id);
         return Ok(availabilities);
     }
 
@@ -53,18 +52,18 @@ public class DoctorController : AppController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateDoctor([FromRoute]Guid id, [FromBody] DoctorUpdateModel.Request request)
+    public async Task<IActionResult> UpdateDoctor([FromRoute]Guid doctorId, [FromBody] DoctorModel.Request request)
     {
-        await _service.UpdateDoctor(request);
+        await _service.UpdateDoctor(doctorId, request);
         return Ok();
     }
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteDoctor([FromRoute]Guid id) 
+    public async Task<IActionResult> DeleteDoctor([FromRoute]Guid doctorId) 
     {
-        await _service.DeleteDoctor(id);
+        await _service.DeleteDoctor(doctorId);
         return Ok();
     }
 }

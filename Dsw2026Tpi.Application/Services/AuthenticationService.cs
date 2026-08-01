@@ -5,7 +5,10 @@ using Dsw2026Tpi.CrossCutting.Helpers;
 using Dsw2026Tpi.CrossCutting.Identity;
 using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Data.Identity;
+using Dsw2026Tpi.Domain.Entities;
+using Dsw2026Tpi.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Dsw2026Tpi.Application.Services;
@@ -17,18 +20,21 @@ public class AuthenticationService : IAuthenticationService
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly JwtService _jwtService;
     private readonly ILogger<AuthenticationService> _logger;
+    private readonly IPersistence _persistence;
 
     public AuthenticationService(UserManager<ApplicationUser> userManager,
         ISignInService signInManager,
         RoleManager<IdentityRole> roleManager,
         JwtService jwtService,
-        ILogger<AuthenticationService> logger)
+        ILogger<AuthenticationService> logger,
+        IPersistence persistence)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _roleManager = roleManager;
         _jwtService = jwtService;
         _logger = logger;
+        _persistence = persistence;
     }
     public async Task<LoginAdminModel.Response> LoginAdmin(LoginAdminModel.Request request)
     {
@@ -52,9 +58,60 @@ public class AuthenticationService : IAuthenticationService
         );
     }
 
-    public async Task<LoginPatientModel.Response> LoginPatient(LoginPatientModel.Response request)
+    public async Task<LoginPatientModel.Response> LoginPatient(LoginPatientModel.Request request)
     {
-        throw new NotImplementedException();
+        if (!request.Email.IsEmailValid()) throw new AuthenticationException();
+        var dni = request.Dni.ToString();
+        if (dni.Length < 7 || dni.Length > 8)
+            throw new AuthenticationException();
+
+        var user = await _userManager.FindByEmailAsync(request.Email);
+
+        if (user == null)
+        {
+            var userExist = await _userManager.Users.AnyAsync(u => u.Dni == request.Dni);
+            if (userExist)
+                throw new Exception("ya existe DNI");
+
+            user = new ApplicationUser
+            {
+                UserName = request.Email,
+                Email = request.Email,
+                Dni = request.Dni,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var result = await _userManager.CreateAsync(user);
+            if (!result.Succeeded)
+            {
+                _logger.LogError("Error al crear el paciente con Email: {Email}", request.Email);
+                throw new AuthenticationException();
+            }
+
+            var patient = new Patient(dni, request.Email);
+            var newPatient = await _persistence.Add<Patient>(patient);
+            if (newPatient is null)
+            {
+                _logger.LogError("Error al crear el paciente con Email: {Email}", request.Email);
+                throw new Exception();
+            }
+            _ = await _userManager.AddToRoleAsync(user, Roles.Patient);
+        }
+
+        if (user.Dni != request.Dni)
+        {
+            _logger.LogError("Error al crear el paciente con Email: {Email}", request.Email);
+            throw new AuthenticationException();
+        }
+        var role = Roles.Patient;
+
+        var token = _jwtService.GenerateToken(user.UserName!, role);
+
+        return new LoginPatientModel.Response(
+            token,
+            role
+        );
     }
 
     public async Task<RegisterModel.Response> Register(RegisterModel.Request request)
@@ -66,8 +123,8 @@ public class AuthenticationService : IAuthenticationService
         {
             UserName = request.Email,
             Email = request.Email,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
@@ -75,7 +132,7 @@ public class AuthenticationService : IAuthenticationService
         if (!result.Succeeded) throw new ConflictException(nameof(ErrorCodes.REGISTER_USER_CONFLICT),
             ErrorCodes.REGISTER_USER_CONFLICT)
                 .WithDetail(result.Errors.Select(e => (e.Code, e.Description)));
-       
+
         _ = await _userManager.AddToRoleAsync(user, Roles.Administrator);
 
         _logger.LogInformation("Usuario registrado: {Email}", request.Email);

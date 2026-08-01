@@ -22,7 +22,7 @@ public class Doctor : EntityBase
     public void Deactivate()
     {
         IsActive = false;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.Now;
     }
     public Doctor(string name, string licenseNumber, Speciality speciality, Guid? id = null) : base(id)
     {

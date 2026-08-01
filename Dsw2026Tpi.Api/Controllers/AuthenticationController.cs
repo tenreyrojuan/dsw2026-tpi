@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
-[Route("auth")]
+[Route("api/auth")]
 public class AuthenticationController : AppController
 {
     private readonly IAuthenticationService _authenticationService;
@@ -13,18 +13,14 @@ public class AuthenticationController : AppController
     {
         _authenticationService = authenticationService;
     }
-    /// <summary>
-    /// Se esta enviando al servicio el DTOs
-    /// de la request. Deberiamos cambiar request por
-    /// un DTO independiente a la Api?
-    /// </summary>
+
     [HttpPost("admin/register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Register([FromQuery] RegisterModel.Request request)
+    public async Task<IActionResult> Register([FromBody] RegisterModel.Request request)
     {
         var result = await _authenticationService.Register(request);
-        return Ok(result.Email); 
+        return Ok(result.Email);
     }
 
     [HttpPost("admin/login")]
@@ -33,6 +29,15 @@ public class AuthenticationController : AppController
     public async Task<IActionResult> Login([FromBody] LoginAdminModel.Request request)
     {
         var result = await _authenticationService.LoginAdmin(request);
+        return Ok(result);
+    }
+
+    [HttpPost("patient/login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> LoginPacient([FromBody] LoginPatientModel.Request request)
+    {
+        var result = await _authenticationService.LoginPatient(request);
         return Ok(result);
     }
 }

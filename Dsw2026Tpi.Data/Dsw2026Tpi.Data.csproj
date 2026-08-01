@@ -25,4 +25,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\Domain\" />
+    <Folder Include="Migrations\Identity\" />
+  </ItemGroup>
+
 </Project>

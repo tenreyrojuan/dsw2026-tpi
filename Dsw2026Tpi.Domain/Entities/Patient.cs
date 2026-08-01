@@ -4,7 +4,6 @@ public class Patient : EntityBase
 {
     public string Dni { get; init; }
     public string Name { get; init; }
-    public string Phone { get; private set; }
 
     public ICollection<Appointment> Appointments { get; private set; } = [];
 
@@ -16,14 +15,9 @@ public class Patient : EntityBase
     }
 #pragma warning restore CS8618
     #endregion
-    public Patient(string dni, string name, string phone, Guid? id =null) : base(id)
+    public Patient(string dni, string name, Guid? id =null) : base(id)
     {
         Dni = dni;
         Name = name;
-        Phone = phone;
-    }
-    public void UpdatePhone(string phone)
-    {
-        Phone = phone;
     }
 }

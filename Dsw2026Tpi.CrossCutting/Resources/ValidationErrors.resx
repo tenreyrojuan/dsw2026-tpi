@@ -120,4 +120,7 @@
   <data name="INVALID_NAME" xml:space="preserve">
     <value>El nombre es inválido. El campo debe tener entre 3 y 100 caracteres, y no estar vacío.</value>
   </data>
+  <data name="SLOT_ALREADY_TAKEN" xml:space="preserve">
+    <value>El espacio de tiempo ya está reservado.</value>
+  </data>
 </root>

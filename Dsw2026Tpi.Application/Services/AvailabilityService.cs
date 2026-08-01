@@ -20,7 +20,7 @@ public class AvailabilityService : IAvailabilityService
         Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.Availabilities))
             ?? throw new EntityNotFoundException(nameof(Doctor));
 
-        var now = DateTime.UtcNow;
+        var now = DateTime.Now;
         var currentMonth = now.Month;
         var currentYear = now.Year;
 
