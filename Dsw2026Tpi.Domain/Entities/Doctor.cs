@@ -37,4 +37,11 @@ public class Doctor : EntityBase
         LicenseNumber = licenseNumber;
         SpecialityId = specialityId;
     }
+    public void UpdateDoctorAvailabilities(ICollection<Availability> availabilities)
+    {
+        Availabilities.Clear();
+        foreach(var availability in availabilities)
+            Availabilities.Add(availability);
+    }
+
 }
