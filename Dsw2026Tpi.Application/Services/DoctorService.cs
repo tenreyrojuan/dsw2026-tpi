@@ -6,6 +6,7 @@ using Dsw2026Tpi.CrossCutting.Exceptions;
 using System.Linq.Expressions;
 using Dsw2026Tpi.CrossCutting.Helpers;
 using Dsw2026Tpi.CrossCutting.Resources;
+using System.Globalization;
 
 
 namespace Dsw2026Tpi.Application.Services;
@@ -44,14 +45,14 @@ public class DoctorService : IDoctorService
             availabilities
             .OrderBy(a => a.WeekDay)
             .Select(a => new DoctorAvailabilityModel.Response(
-                a.WeekDay.ToString().ToUpper(), // nameof(a.WeekDay) devuelve el valor literal WeekDay
+                CultureInfo.GetCultureInfo("es-ES").DateTimeFormat.GetDayName(a.WeekDay).ToUpper(),
                 a.StartingHour.ToString("HH:mm"),
                 a.EndingHour.ToString("HH:mm")
                 )
             );
     }
 
-    public async Task AddDoctor(DoctorModel.Request request)
+    public async Task<DoctorModel.Response> AddDoctor(DoctorModel.Request request)
     {
         if (!request.Name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
@@ -60,8 +61,9 @@ public class DoctorService : IDoctorService
         var speciality = await _persistence.First<Speciality>(s => s.Id == request.SpecialityId) 
             ?? throw new EntityNotFoundException(nameof(Speciality));
 
-        var doctor = new Doctor(request.Name, request.LicenseNumber, speciality);
-        _ = await _persistence.Add<Doctor>(doctor);
+        var newDoctor = await _persistence.Add<Doctor>(new Doctor(request.Name, request.LicenseNumber, speciality));
+        return new DoctorModel.Response(newDoctor.Id, newDoctor.Name,newDoctor.LicenseNumber,
+            new DoctorModel.SpecialityDto(newDoctor.Speciality?.Id, newDoctor.Speciality?.Name));
     }
 
     public async Task UpdateDoctor(Guid doctorId,DoctorModel.Request request)
