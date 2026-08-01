@@ -30,7 +30,7 @@ public sealed class Appointment : EntityBase
 
     public void Cancel()
     {
-        AppointmentState = AppointmentState.CANCELED;
+        AppointmentState = AppointmentState.CANCELLED;
         CancelledAt = DateTime.Now;
     }
     
