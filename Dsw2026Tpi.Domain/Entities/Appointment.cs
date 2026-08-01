@@ -9,8 +9,8 @@ public sealed class Appointment : EntityBase
     public AppointmentState AppointmentState { get; private set; }
     public Guid PatientId { get; init; }
     public Guid TimeSlotId { get; init; }
-    public Patient Patient { get; private set; }
-    public TimeSlot TimeSlot { get; private set; }
+    public Patient Patient { get; init; }
+    public TimeSlot TimeSlot { get; init; }
 
     #region Constructor for EF
 #pragma warning disable CS8618
