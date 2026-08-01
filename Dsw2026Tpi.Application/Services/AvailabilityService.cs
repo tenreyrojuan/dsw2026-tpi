@@ -52,11 +52,12 @@ public class AvailabilityService : IAvailabilityService
 
         ICollection<Availability> finalAvailabilities = 
             CreateFinalAvailabilities(request.Days,doctor,currentMonth,currentYear,now);
-        
-        var updatedDoctor = await _persistence.Update(doctor);
 
-        return new AvailabilityModel.Response(updatedDoctor.Id,
-            finalAvailabilities.Select(a => new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));
+        var disps = await _persistence.AddRange(finalAvailabilities);
+
+        return new AvailabilityModel.Response(doctor.Id,
+            finalAvailabilities.Select(a => 
+            new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));
 
     }
     private ICollection<Availability> CreateFinalAvailabilities(
