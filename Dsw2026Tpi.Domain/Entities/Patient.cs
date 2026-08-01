@@ -17,9 +17,10 @@ public sealed class Patient : EntityBase
     }
 #pragma warning restore CS8618
     #endregion
-    public Patient(string dni, string name, Guid? id =null) : base(id)
+    public Patient(string dni, string name, Guid userId, Guid? id =null) : base(id)
     {
         Dni = dni;
         FullName = name;
+        UserId = userId;
     }
 }
