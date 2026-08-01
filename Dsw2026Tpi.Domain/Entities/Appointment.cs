@@ -32,6 +32,7 @@ public sealed class Appointment : EntityBase
     {
         AppointmentState = AppointmentState.CANCELLED;
         CancelledAt = DateTime.Now;
+        TimeSlot.Release();
         UpdateTimestamp();
     }
     
