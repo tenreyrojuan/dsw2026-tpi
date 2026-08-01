@@ -49,13 +49,18 @@ public class PersistenceEf: IPersistence
         return await Include(_context.Set<T>(), include).Where(predicate).ToListAsync();
     }
 
+    public async Task<IEnumerable<T>> AddRange<T>(IEnumerable<T> entities) where T : EntityBase
+    {
+        await _context.AddRangeAsync(entities);
+        await _context.SaveChangesAsync();
+        return entities;
+    }
     public async Task<T> Update<T>(T entity) where T : EntityBase
     {
         _context.Update(entity);
         await _context.SaveChangesAsync();
         return entity;
     }
-
     public async Task<Pagination<T>> Paginate<T, TKey>(int pageSize, int pageIndex, Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> sortOrder, params string[] includes) where T : EntityBase
     {
         pageSize = Math.Abs(pageSize);
