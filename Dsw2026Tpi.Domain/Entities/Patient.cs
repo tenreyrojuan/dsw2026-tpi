@@ -3,7 +3,7 @@
 public sealed class Patient : EntityBase
 {
     public string Dni { get; init; }
-    public string Name { get; init; }
+    public string FullName { get; init; }
 
     public ICollection<Appointment> Appointments { get; private set; } = [];
 
@@ -18,6 +18,6 @@ public sealed class Patient : EntityBase
     public Patient(string dni, string name, Guid? id =null) : base(id)
     {
         Dni = dni;
-        Name = name;
+        FullName = name;
     }
 }

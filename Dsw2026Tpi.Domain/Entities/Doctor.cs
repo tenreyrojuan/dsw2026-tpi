@@ -4,8 +4,8 @@ public sealed class Doctor : EntityBase
 {
     public string Name { get; private set; }
     public string LicenseNumber { get; private set; }
-    public Guid? SpecialityId { get; private set; }
-    public Speciality? Speciality { get; private set; }
+    public Guid SpecialityId { get; private set; }
+    public Speciality Speciality { get; private set; }
 
     public ICollection<Availability> Availabilities { get; private set; } = [];
 
@@ -31,7 +31,7 @@ public sealed class Doctor : EntityBase
         Speciality = speciality;
     }
 
-    public void UpdateDoctor(string name, string licenseNumber, Guid? specialityId)
+    public void UpdateDoctor(string name, string licenseNumber, Guid specialityId)
     {
         Name = name;
         LicenseNumber = licenseNumber;
