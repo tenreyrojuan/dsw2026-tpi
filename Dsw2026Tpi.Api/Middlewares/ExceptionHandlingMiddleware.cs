@@ -1,6 +1,7 @@
 ﻿using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.CrossCutting.Models;
 using Dsw2026Tpi.CrossCutting.Resources;
+using Microsoft.Identity.Client;
 using System.Net;
 using System.Text.Json;
 
@@ -41,7 +42,8 @@ public class ExceptionHandlingMiddleware
             EntityNotFoundException => HttpStatusCode.NotFound,
             ConflictException or AuthenticationException => HttpStatusCode.Conflict,
             AuthorizationException => HttpStatusCode.Unauthorized,
-            BusinessRuleException => HttpStatusCode.UnprocessableContent, // faltaba BusinessRuleException para validar reglas de negocio
+            BusinessRuleException => HttpStatusCode.UnprocessableContent,
+            TooManyRequestsException => HttpStatusCode.TooManyRequests,
             _ => HttpStatusCode.InternalServerError,
         };
         var result = JsonSerializer.Serialize(error);
