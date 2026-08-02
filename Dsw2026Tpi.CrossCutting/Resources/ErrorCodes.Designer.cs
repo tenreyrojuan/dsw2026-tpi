@@ -88,6 +88,15 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Se intento guardar un recurso duplicado..
+        /// </summary>
+        public static string CONFLICT_DUPLICATE_RESOURCE {
+            get {
+                return ResourceManager.GetString("CONFLICT_DUPLICATE_RESOURCE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a La entidad {0} no se encontró.
         /// </summary>
         public static string ENTITY_NOTFOUND {

@@ -126,6 +126,9 @@
   <data name="BUSINESS_ERROR" xml:space="preserve">
     <value>Se produjo un error al no cumplirse alguna regla de negocio</value>
   </data>
+  <data name="CONFLICT_DUPLICATE_RESOURCE" xml:space="preserve">
+    <value>Se intento guardar un recurso duplicado.</value>
+  </data>
   <data name="ENTITY_NOTFOUND" xml:space="preserve">
     <value>La entidad {0} no se encontró</value>
   </data>
