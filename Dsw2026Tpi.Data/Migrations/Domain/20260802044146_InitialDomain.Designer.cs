@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2026Tpi.Data.Migrations.Domain
 {
     [DbContext(typeof(Dsw2026TpiDbContext))]
-    [Migration("20260731054803_InitialModel")]
-    partial class InitialModel
+    [Migration("20260802044146_InitialDomain")]
+    partial class InitialDomain
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,8 +33,8 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
 
                     b.Property<string>("AppointmentState")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime?>("AttendedAt")
                         .HasColumnType("datetime2");
@@ -55,8 +55,8 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
 
                     b.Property<string>("Reason")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<Guid>("TimeSlotId")
                         .HasColumnType("uniqueidentifier");
@@ -146,7 +146,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid?>("SpecialityId")
+                    b.Property<Guid>("SpecialityId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -181,7 +181,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -189,9 +189,15 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Dni")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
                         .IsUnique();
 
                     b.ToTable("Patients", (string)null);
@@ -260,8 +266,8 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
 
                     b.Property<string>("TimeSlotState")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -308,7 +314,8 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                     b.HasOne("Dsw2026Tpi.Domain.Entities.Speciality", "Speciality")
                         .WithMany()
                         .HasForeignKey("SpecialityId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Speciality");
                 });
