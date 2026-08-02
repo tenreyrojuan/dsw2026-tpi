@@ -29,7 +29,7 @@ public class AppointmentController : AppController
         return Ok(result);
     }
 
-    [HttpGet]
+    [HttpGet("patient")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
