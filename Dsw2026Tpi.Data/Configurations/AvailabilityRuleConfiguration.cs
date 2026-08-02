@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Dsw2026Tpi.Data.Configurations;
 
-public class AvailabilityConfiguration : IEntityTypeConfiguration<Availability>
+public class AvailabilityRuleConfiguration : IEntityTypeConfiguration<AvailabilityRule>
 {
-    public void Configure(EntityTypeBuilder<Availability> builder)
+    public void Configure(EntityTypeBuilder<AvailabilityRule> builder)
     {
         builder.ToTable("Availabilities");
         builder.HasKey(a => a.Id);

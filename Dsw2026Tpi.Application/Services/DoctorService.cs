@@ -35,11 +35,11 @@ public class DoctorService : IDoctorService
             ?? throw new EntityNotFoundException(nameof(Doctor))
             .WithDetail(nameof(doctorId), Issue.ID_NOTFOUND);
 
-        Expression<Func<Availability, bool>> predicate = a => a.DoctorId == doctorId
+        Expression<Func<AvailabilityRule, bool>> predicate = a => a.DoctorId == doctorId
                                                          && a.Month == DateTime.Now.Month 
                                                          && a.Year == DateTime.Now.Year;
                                                          
-        var availabilities = await _persistence.GetFiltered<Availability>(predicate); 
+        var availabilities = await _persistence.GetFiltered<AvailabilityRule>(predicate); 
         
         // si no hay disponibilidades, se devuelve una lista vacia
         return availabilities is null? [] : 

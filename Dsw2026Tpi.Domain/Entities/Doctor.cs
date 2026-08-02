@@ -7,7 +7,7 @@ public sealed class Doctor : EntityBase
     public Guid SpecialtyId { get; private set; }
     public Specialty Specialty { get; private set; }
 
-    public ICollection<Availability> Availabilities { get; private set; } = [];
+    public ICollection<AvailabilityRule> Availabilities { get; private set; } = [];
 
     public bool IsActive { get; private set; } = true;
 
@@ -38,11 +38,11 @@ public sealed class Doctor : EntityBase
         SpecialtyId = specialtyId;
         UpdateTimestamp();
     }
-    public void UpdateDoctorAvailabilities(ICollection<Availability> availabilities)
+    public void UpdateDoctorAvailabilities(ICollection<AvailabilityRule> availabilities)
     {
         Availabilities.Clear();
-        foreach(var availability in availabilities)
-            Availabilities.Add(availability);
+        foreach(var availabilityRule in availabilities)
+            Availabilities.Add(availabilityRule);
     }
 
 }

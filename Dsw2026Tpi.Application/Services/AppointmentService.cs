@@ -35,46 +35,46 @@ public class AppointmentService : IAppointmentService
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
             .WithDetail(nameof(request.Patient.Dni), Issue.DNI_NOTFOUND);
 
-        var timeSlot = await _persistence.GetById<TimeSlot>(request.AvailabilityTimeSlotId)
+        var availabilitySlot = await _persistence.GetById<AvailabilitySlot>(request.AvailabilitySlotId)
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
-            .WithDetail(nameof(request.AvailabilityTimeSlotId), Issue.ID_NOTFOUND);
+            .WithDetail(nameof(request.AvailabilitySlotId), Issue.ID_NOTFOUND);
 
         var today = DateOnly.FromDateTime(DateTime.Now);
-        if (timeSlot.Date < today)
+        if (availabilitySlot.Date < today)
             throw new BusinessRuleException()
-                .WithDetail(nameof(timeSlot.Date), Issue.NOTACTUAL_SLOT);
+                .WithDetail(nameof(availabilitySlot.Date), Issue.NOTACTUAL_SLOT);
 
         var existingAppointment = await _persistence.First<Appointment>(a =>
-            a.TimeSlotId == request.AvailabilityTimeSlotId &&
-            a.TimeSlot.TimeSlotState == TimeSlotState.AVAILABLE);
+            a.AvailabilitySlotId == request.AvailabilitySlotId &&
+            a.AvailabilitySlot.AvailabilitySlotState == AvailabilitySlotState.AVAILABLE);
 
         if (existingAppointment != null)
             throw new BusinessRuleException()
                 .WithDetail(nameof(existingAppointment), Issue.NOTAVAILABLE_SLOT);
 
-        var newAppointment = new Appointment(patient, timeSlot, request.Reason);
+        var newAppointment = new Appointment(patient, availabilitySlot, request.Reason);
         var appointment = await _persistence.Add<Appointment>(newAppointment);
 
-        return new AppointmentModel.Response(appointment.Patient.FullName, today, timeSlot.StartingTime);
+        return new AppointmentModel.Response(appointment.Patient.FullName, today, availabilitySlot.StartingTime);
     }
 
     public async Task<IEnumerable<AppointmentModel.Response>> GetPatientAppointment(string dni)
     {
         var appointment = await _persistence.GetFiltered<Appointment>(
             a => a.Patient.Dni == dni && a.AppointmentState == AppointmentState.BOOKED, 
-            nameof (Patient), nameof(TimeSlot));
+            nameof (Patient), nameof(AvailabilitySlot));
         
         return appointment is null ? [] : 
             appointment.Select(a => new AppointmentModel.Response(
-                a.Patient.FullName, a.TimeSlot.Date, a.TimeSlot.StartingTime));
+                a.Patient.FullName, a.AvailabilitySlot.Date, a.AvailabilitySlot.StartingTime));
     }
 
-    public async Task<AppointmentModel.Response> DeleteAppointment (Guid availabilityTimeSlotid)
+    public async Task<AppointmentModel.Response> DeleteAppointment (Guid availabilitySlotId)
     {
         var appointment = await _persistence.GetById<Appointment>(
-            availabilityTimeSlotid, nameof(Patient), nameof(TimeSlot))
+            availabilitySlotId, nameof(Patient), nameof(AvailabilitySlot))
                 ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
-                .WithDetail(nameof(availabilityTimeSlotid), Issue.ID_NOTFOUND);
+                .WithDetail(nameof(availabilitySlotId), Issue.ID_NOTFOUND);
 
 
         if (appointment.AppointmentState != AppointmentState.BOOKED)
@@ -84,7 +84,7 @@ public class AppointmentService : IAppointmentService
         appointment = await _persistence.Delete<Appointment>(appointment);
 
         return new AppointmentModel.Response(
-            appointment.Patient.FullName, appointment.TimeSlot.Date,
-            appointment.TimeSlot.StartingTime);
+            appointment.Patient.FullName, appointment.AvailabilitySlot.Date,
+            appointment.AvailabilitySlot.StartingTime);
     }
 }
