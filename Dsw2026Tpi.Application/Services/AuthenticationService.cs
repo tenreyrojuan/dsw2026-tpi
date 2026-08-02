@@ -39,14 +39,21 @@ public class AuthenticationService : IAuthenticationService
     }
     public async Task<LoginAdminModel.Response> LoginAdmin(LoginAdminModel.Request request)
     {
-        if (!request.Email.IsEmailValid()) throw new AuthenticationException();
-        var user = await _userManager.FindByEmailAsync(request.Email) ?? throw new AuthenticationException();
+        if (!request.Email.IsEmailValid()) 
+            throw new AuthenticationException()
+                .WithDetail(nameof(request.Email), Issue.INVALID_EMAIL);
+
+        var user = await _userManager.FindByEmailAsync(request.Email) 
+            ?? throw new AuthenticationException()
+                .WithDetail(nameof(request.Email), Issue.EMAIL_ERROR);
+
         var result = await _signInManager.CheckPassword(user, request.Password);
 
         if (!result)
         {
             _logger.LogError("Intento de login fallido para: {Email}", request.Email);
-            throw new AuthenticationException();
+            throw new AuthenticationException()
+                .WithDetail(nameof(result), Issue.PASSWORD_ERROR);
         }
 
         var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
@@ -62,26 +69,30 @@ public class AuthenticationService : IAuthenticationService
     public async Task<LoginPatientModel.Response> LoginPatient(LoginPatientModel.Request request)
     {
         var role = Roles.Patient;
-        
+
         if (!request.Email.IsEmailValid())
-            throw new AuthenticationException();
+            throw new AuthenticationException()
+                .WithDetail(nameof(request.Email), Issue.INVALID_EMAIL);
 
         var dni = request.Dni.ToString();
 
-        if (dni.Length < 7 || dni.Length > 8)
-            throw new AuthenticationException();
+        if (!dni.IsDniValid())
+            throw new AuthenticationException()
+                .WithDetail(nameof(dni), Issue.INVALID_DNI);
 
         var user = await _userManager.FindByEmailAsync(request.Email);
-        
+
         // Usuario Existe
-        if (user != null) 
+        if (user != null)
         {
 
-            var patient = await _persistence.First<Patient>(p => p.UserId == Guid.Parse(user.Id));
-                
-            if (patient!.Dni != dni)
+            var patient = await _persistence.First<Patient>(p => p.UserId == Guid.Parse(user.Id))
+                ?? throw new Exception();
+
+            if (patient.Dni != dni)
             {
-                throw new AuthenticationException();
+                throw new AuthenticationException()
+                    .WithDetail(nameof(dni), Issue.PASSWORD_ERROR);
             }
             var token = _jwtService.GenerateToken(user.UserName!, role);
             return new LoginPatientModel.Response(
@@ -92,7 +103,8 @@ public class AuthenticationService : IAuthenticationService
         // Usuario Nuevo
         var userExist = await _persistence.First<Patient>(p => p.Dni == dni);
         if (userExist != null)
-            throw new Exception("ya existe DNI");
+            throw new ConflictException()
+                .WithDetail(nameof(dni), Issue.DUPLICATE_DNI);
 
         user = new ApplicationUser
         {
@@ -106,28 +118,28 @@ public class AuthenticationService : IAuthenticationService
         if (!result.Succeeded)
         {
             _logger.LogError("Error al crear el paciente con Email: {Email}", request.Email);
-            throw new AuthenticationException();
+            throw new ConflictException()
+                .WithDetail(result.Errors.Select(e => (e.Code, e.Description)));
         }
 
         var patientNew = new Patient(dni, request.Email, Guid.Parse(user.Id));
-        
+
         var newPatient = await _persistence.Add<Patient>(patientNew);
+
         if (newPatient is null)
-        {
             _logger.LogError("Error al crear el paciente con Email: {Email}", request.Email);
-            throw new AuthenticationException();
-        }
 
         _ = await _userManager.AddToRoleAsync(user, Roles.Patient);
-        
+
         var tokenNew = _jwtService.GenerateToken(user.UserName!, role);
         return new LoginPatientModel.Response(tokenNew, role);
     }
 
     public async Task<RegisterModel.Response> Register(RegisterModel.Request request)
     {
-        if (!request.Email.IsEmailValid()) throw new ValidationException(ErrorCodes.REGISTER_USER_INVALID,
-            nameof(ErrorCodes.REGISTER_USER_INVALID));
+        if (!request.Email.IsEmailValid()) 
+            throw new ValidationException()
+                .WithDetail(nameof(request.Email), Issue.INVALID_EMAIL);
 
         var user = new ApplicationUser
         {
@@ -139,8 +151,8 @@ public class AuthenticationService : IAuthenticationService
 
         var result = await _userManager.CreateAsync(user, request.Password);
 
-        if (!result.Succeeded) throw new ConflictException(nameof(ErrorCodes.REGISTER_USER_CONFLICT),
-            ErrorCodes.REGISTER_USER_CONFLICT)
+        if (!result.Succeeded) 
+            throw new ConflictException()
                 .WithDetail(result.Errors.Select(e => (e.Code, e.Description)));
 
         _ = await _userManager.AddToRoleAsync(user, Roles.Administrator);

@@ -1,9 +1,15 @@
-﻿using Dsw2026Tpi.CrossCutting.Identity;
+﻿using Dsw2026Tpi.CrossCutting.Exceptions;
+using Dsw2026Tpi.CrossCutting.Identity;
 using Dsw2026Tpi.Data.Identity;
+using Dsw2026Tpi.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
+using System.Threading.RateLimiting;
 
 namespace Dsw2026Tpi.Api.Configurations;
 
@@ -101,4 +107,48 @@ public static class SecurityConfigurationExtensions
           .AddDefaultTokenProviders();
         return services;
     }
+    public static IServiceCollection AddRateLimiting(this IServiceCollection services)
+    {
+        services.AddRateLimiter(options =>
+        {
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+                factory: partition => new FixedWindowRateLimiterOptions
+                {
+                    AutoReplenishment = true,
+                    PermitLimit = 100,
+                    QueueLimit = 0,
+                    Window = TimeSpan.FromMinutes(1)
+                }));
+
+            options.AddFixedWindowLimiter(Policies.AdminRequestsPolicy, opt =>
+                {
+                    opt.AutoReplenishment = true;
+                    opt.PermitLimit = 5;
+                    opt.QueueLimit = 0;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                });
+            options.AddFixedWindowLimiter(Policies.PatientRequestsPolicy, opt =>
+                    {
+                        opt.AutoReplenishment = true;
+                        opt.PermitLimit = 10;
+                        opt.QueueLimit = 0;
+                        opt.Window = TimeSpan.FromMinutes(1);
+                    });
+            options.AddFixedWindowLimiter(Policies.AppointmentRequestsPolicy, opt =>
+            {
+                opt.AutoReplenishment = true;
+                opt.PermitLimit = 5;
+                opt.QueueLimit = 0;
+                opt.Window = TimeSpan.FromMinutes(1);
+            });
+            options.OnRejected = async (context, cancellationToken) =>
+            {
+                throw new TooManyRequestsException();
+            };
+        });
+        return services;
+    }
+    
 }

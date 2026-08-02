@@ -29,8 +29,10 @@ public class SpecialityService : ISpecialityService
     {
         if (!name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
-                .WithDetail(nameof(name),ValidationErrors.INVALID_NAME);
-
+                .WithDetail(nameof(name),Issue.INVALID_NAME);
+        if (!description.IsDescriptionValid())
+            throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
+                .WithDetail(nameof(description), Issue.INVALID_DESCRIPTION);
         var speciality= new Speciality(name, description);
         _ = await _persistence.Add<Speciality>(speciality);
     }
@@ -39,10 +41,11 @@ public class SpecialityService : ISpecialityService
     {
         if (!name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
-                .WithDetail(nameof(name),ValidationErrors.INVALID_NAME);
+                .WithDetail(nameof(name),Issue.INVALID_NAME);
 
         var speciality = await _persistence.GetById<Speciality>(id)
-            ?? throw new EntityNotFoundException(nameof(Speciality));
+            ?? throw new EntityNotFoundException(nameof(Speciality))
+            .WithDetail(nameof(id), Issue.ID_NOTFOUND);
 
         speciality.UpdateSpeciality(name, description);
 
@@ -52,7 +55,8 @@ public class SpecialityService : ISpecialityService
     public async Task DeleteSpeciality(Guid id)
     {
         var speciality = await _persistence.GetById<Speciality>(id)
-            ?? throw new EntityNotFoundException(nameof(Speciality));
+            ?? throw new EntityNotFoundException(nameof(Speciality))
+            .WithDetail(nameof(id), Issue.ID_NOTFOUND);
 
         _ = await _persistence.Delete<Speciality>(speciality);
     }

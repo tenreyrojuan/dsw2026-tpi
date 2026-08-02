@@ -5,7 +5,6 @@ using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 using System.Numerics;
-using static Dsw2026Tpi.Application.Dtos.AvailabilityModel;
 
 namespace Dsw2026Tpi.Application.Services;
 
@@ -20,7 +19,8 @@ public class AvailabilityService : IAvailabilityService
     public async Task<AvailabilityModel.Response> AddAvailability(AvailabilityModel.Request request)
     {
         Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.Availabilities))
-            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND);
+            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
+            .WithDetail(nameof(request.DoctorId), Issue.ID_NOTFOUND);
 
         var now = DateTime.Now;
         var currentMonth = now.Month;
@@ -38,7 +38,8 @@ public class AvailabilityService : IAvailabilityService
     public async Task<AvailabilityModel.Response> UpdateAvailability(AvailabilityModel.Request request)
     {
         Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.Availabilities))
-            ?? throw new EntityNotFoundException(nameof(Doctor));
+            ?? throw new EntityNotFoundException(nameof(Doctor))
+            .WithDetail(nameof(request.DoctorId), Issue.ID_NOTFOUND);
 
         var now = DateTime.Now;
         var currentMonth = now.Month;
@@ -70,7 +71,8 @@ public class AvailabilityService : IAvailabilityService
         foreach (var day in days)
         {
             if (day.StartTime >= day.EndTime)
-                throw new BusinessRuleException(ErrorCodes.BUSINESS_ERROR, "startTime debe ser antes que endTime!");
+                throw new BusinessRuleException()
+                    .WithDetail(nameof(day), Issue.DAY_ERROR);
 
             DayOfWeek weekDay = ParseDayOfWeek(day.Day);
 
@@ -81,7 +83,8 @@ public class AvailabilityService : IAvailabilityService
             a.HasOverlappingSchedules(day.StartTime, day.EndTime));
 
             if (hasOverlap)
-                throw new ConflictException(ErrorCodes.BUSINESS_ERROR, "se ha detectado un solapamiento de horarios");
+                throw new ConflictException()
+                    .WithDetail(nameof(hasOverlap), Issue.OVERLAP);
 
             var availability = new Availability(currentMonth, currentYear, weekDay, day.StartTime, day.EndTime, doctor);
 
@@ -105,7 +108,7 @@ public class AvailabilityService : IAvailabilityService
             "jueves" => DayOfWeek.Thursday,
             "viernes" => DayOfWeek.Friday,
             "sabado" or "sábado" => DayOfWeek.Saturday,
-            _ => throw new ArgumentException($"Día inválido: {day}")
+            _ => throw new ValidationException().WithDetail(nameof(day), Issue.INVALID_DAY)
         };
     }
 

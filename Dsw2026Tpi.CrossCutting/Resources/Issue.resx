@@ -117,10 +117,52 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="INVALID_NAME" xml:space="preserve">
-    <value>El nombre es inválido. El campo debe tener entre 3 y 100 caracteres, y no estar vacío.</value>
+  <data name="INVALID_DNI" xml:space="preserve">
+    <value>El DNI es inválido. El campo debe contener entre 7 y 10 números.</value>
   </data>
-  <data name="SLOT_ALREADY_TAKEN" xml:space="preserve">
-    <value>El espacio de tiempo ya está reservado.</value>
+  <data name="ID_NOTFOUND" xml:space="preserve">
+    <value>El ID no corresponde a una entidad registrada.</value>
+  </data>
+  <data name="INVALID_NAME" xml:space="preserve">
+    <value>El Nombre es inválido. El campo debe contener entre 3 y 100 caracteres.</value>
+  </data>
+  <data name="INVALID_REASON" xml:space="preserve">
+    <value>La Razón es inválida. El campo debe contener por lo menos 5 caracteres.</value>
+  </data>
+  <data name="DNI_NOTFOUND" xml:space="preserve">
+    <value>El DNI no corresponde a un paciente registrado.</value>
+  </data>
+  <data name="NOTACTUAL_SLOT" xml:space="preserve">
+    <value>El Turno debe corresponder a fechas posteriores a la actual.</value>
+  </data>
+  <data name="NOTAVAILABLE_SLOT" xml:space="preserve">
+    <value>El Turno debe estar disponible.</value>
+  </data>
+  <data name="NOT_BOOKEDSLOT" xml:space="preserve">
+    <value>El Turno no corresponde  a uno ocupado.</value>
+  </data>
+  <data name="INVALID_DAY" xml:space="preserve">
+    <value>El Día no existe.</value>
+  </data>
+  <data name="DAY_ERROR" xml:space="preserve">
+    <value>StartTime debe ser antes que endTime</value>
+  </data>
+  <data name="OVERLAP" xml:space="preserve">
+    <value>Los horarios no deben coincidir con los ya cargados.</value>
+  </data>
+  <data name="INVALID_DESCRIPTION" xml:space="preserve">
+    <value>La Descripción es inválida. El campo debe contener entre 10 y 100 números.</value>
+  </data>
+  <data name="INVALID_EMAIL" xml:space="preserve">
+    <value>El formato del Email no es correcto.</value>
+  </data>
+  <data name="EMAIL_ERROR" xml:space="preserve">
+    <value>El Email no se encontró.</value>
+  </data>
+  <data name="PASSWORD_ERROR" xml:space="preserve">
+    <value>La contraseña es incorrecta.</value>
+  </data>
+  <data name="DUPLICATE_DNI" xml:space="preserve">
+    <value>El DNI ya existe en el sistema</value>
   </data>
 </root>
