@@ -88,6 +88,15 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Ya existe un medico con la licencia ingresada. Ingrese una distinta..
+        /// </summary>
+        public static string DUPLICATE_LICENCE {
+            get {
+                return ResourceManager.GetString("DUPLICATE_LICENCE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El Email no se encontró..
         /// </summary>
         public static string EMAIL_ERROR {
