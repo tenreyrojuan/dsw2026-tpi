@@ -40,9 +40,9 @@ public sealed class Availability : EntityBase
         UpdateTimestamp();
     }
 
-    public bool HasOverlappingSchedules(TimeOnly startingHour, TimeOnly endingHour)
+    public bool HasOverlappingSchedules(TimeOnly requestedStart, TimeOnly requestedEnd)
     {
-        return startingHour < EndingHour && StartingHour < endingHour;
+        return requestedStart < EndingHour && StartingHour < requestedEnd;
     }
 
     public void GenerateMonthlyTimeSlots(int startingDay)
