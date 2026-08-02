@@ -17,6 +17,9 @@ public class PatientConfiguration : IEntityTypeConfiguration<Patient>
         builder.Property(p => p.Dni).HasMaxLength(10).IsRequired();
         builder.HasIndex(p => p.Dni).IsUnique();
 
-        builder.Property(p => p.Name).HasMaxLength(100).IsRequired();
+        builder.Property(p => p.FullName).HasMaxLength(100).IsRequired();
+
+        builder.Property(p => p.UserId).IsRequired();
+        builder.HasIndex(p => p.UserId).IsUnique();
     }
 }
