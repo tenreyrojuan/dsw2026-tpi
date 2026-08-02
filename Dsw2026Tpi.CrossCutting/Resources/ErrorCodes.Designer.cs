@@ -115,6 +115,15 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Hubo un exceso de peticiones.
+        /// </summary>
+        public static string TOO_MANY_REQUESTS {
+            get {
+                return ResourceManager.GetString("TOO_MANY_REQUESTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Se produjo un error no controlado.
         /// </summary>
         public static string UNHANDLED_ERROR {
