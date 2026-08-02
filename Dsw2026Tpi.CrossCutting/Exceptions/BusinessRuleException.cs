@@ -1,3 +1,5 @@
+using Dsw2026Tpi.CrossCutting.Resources;
+
 namespace Dsw2026Tpi.CrossCutting.Exceptions;
 
 /// <summary>
@@ -5,6 +7,11 @@ namespace Dsw2026Tpi.CrossCutting.Exceptions;
 /// </summary>
 public class BusinessRuleException : AppException
 {
+    public BusinessRuleException()
+        : base(ErrorCodes.BUSINESS_ERROR, nameof(ErrorCodes.BUSINESS_ERROR))
+    {
+
+    }
     public BusinessRuleException(string message, string errorCode)
         : base(message, errorCode)
     {

@@ -16,10 +16,10 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Update="Resources\ValidationErrors.Designer.cs">
+    <Compile Update="Resources\Issue.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>ValidationErrors.resx</DependentUpon>
+      <DependentUpon>Issue.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -28,9 +28,9 @@
       <LastGenOutput>ErrorCodes.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\ValidationErrors.resx">
+    <EmbeddedResource Update="Resources\Issue.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>ValidationErrors.Designer.cs</LastGenOutput>
+      <LastGenOutput>Issue.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
