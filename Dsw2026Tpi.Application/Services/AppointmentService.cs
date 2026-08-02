@@ -20,23 +20,23 @@ public class AppointmentService : IAppointmentService
     public async Task<AppointmentModel.Response> AddAppointment(AppointmentModel.Request request)
     {
         if (!request.Patient.Dni.IsDniValid())
-            throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
+            throw new ValidationException()
                 .WithDetail(nameof(request.Patient.Dni), Issue.INVALID_DNI);
 
         if (!request.Reason.IsReasonValid())
-            throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
+            throw new ValidationException()
                 .WithDetail(nameof(request.Patient.Dni), Issue.INVALID_REASON);
 
         var doctor = await _persistence.GetById<Doctor>(request.DoctorId)
-            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
+            ?? throw new EntityNotFoundException(nameof(Doctor))
             .WithDetail(nameof(request.DoctorId), Issue.ID_NOTFOUND);
 
         var patient = await _persistence.First<Patient>(p => p.Dni == request.Patient.Dni)
-            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
+            ?? throw new EntityNotFoundException(nameof(Patient))
             .WithDetail(nameof(request.Patient.Dni), Issue.DNI_NOTFOUND);
 
         var availabilitySlot = await _persistence.GetById<AvailabilitySlot>(request.AvailabilitySlotId)
-            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
+            ?? throw new EntityNotFoundException(nameof(AvailabilitySlot))
             .WithDetail(nameof(request.AvailabilitySlotId), Issue.ID_NOTFOUND);
 
         var today = DateOnly.FromDateTime(DateTime.Now);
@@ -73,7 +73,7 @@ public class AppointmentService : IAppointmentService
     {
         var appointment = await _persistence.GetById<Appointment>(
             availabilitySlotId, nameof(Patient), nameof(AvailabilitySlot))
-                ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
+                ?? throw new EntityNotFoundException(nameof(Appointment))
                 .WithDetail(nameof(availabilitySlotId), Issue.ID_NOTFOUND);
 
 

@@ -165,4 +165,7 @@
   <data name="DUPLICATE_DNI" xml:space="preserve">
     <value>El DNI ya existe en el sistema</value>
   </data>
+  <data name="DUPLICATE_LICENCE" xml:space="preserve">
+    <value>Ya existe un medico con la licencia ingresada. Ingrese una distinta.</value>
+  </data>
 </root>

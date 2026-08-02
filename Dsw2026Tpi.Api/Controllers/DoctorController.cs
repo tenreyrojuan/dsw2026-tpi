@@ -27,7 +27,7 @@ public class DoctorController : AppController
         return Ok(doctors);
     }
 
-    [HttpGet("{id}/availabilities")]
+    [HttpGet("{id:Guid}/availabilities")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -44,21 +44,21 @@ public class DoctorController : AppController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddDoctor([FromBody] DoctorModel.Request request) 
     {
-        await _service.AddDoctor(request);
-        return Ok();
+        var result = await _service.AddDoctor(request);
+        return Ok(result);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:Guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateDoctor([FromRoute] Guid id, [FromBody] DoctorModel.Request request)
     {
-        await _service.UpdateDoctor(id, request);
-        return Ok();
+        var result = await _service.UpdateDoctor(id, request);
+        return Ok(result);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:Guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteDoctor([FromRoute]Guid id) 
