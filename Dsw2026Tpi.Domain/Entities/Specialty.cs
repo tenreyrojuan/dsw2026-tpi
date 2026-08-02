@@ -1,24 +1,24 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 
-public sealed class Speciality : EntityBase
+public sealed class Specialty : EntityBase
 {
     public string Name { get; private set; }
     public string Description { get; private set; }
 
     #region Constructor for EF
 #pragma warning disable CS8618
-    private Speciality() { }
+    private Specialty() { }
 #pragma warning restore CS8618
     #endregion
 
-    public Speciality(string name, string description, Guid? id = null) : base(id)
+    public Specialty(string name, string description, Guid? id = null) : base(id)
     {
         Name = name;
         Description = description;
     }
 
     //metodo nuevo acutalizar especialidades
-    public void UpdateSpeciality(string name, string description)
+    public void UpdateSpecialty(string name, string description)
     {
         Name = name;
         Description = description;
