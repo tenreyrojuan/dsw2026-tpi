@@ -1,11 +1,11 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 
-public class Doctor : EntityBase
+public sealed class Doctor : EntityBase
 {
     public string Name { get; private set; }
     public string LicenseNumber { get; private set; }
-    public Guid? SpecialityId { get; private set; }
-    public Speciality? Speciality { get; private set; }
+    public Guid SpecialityId { get; private set; }
+    public Speciality Speciality { get; private set; }
 
     public ICollection<Availability> Availabilities { get; private set; } = [];
 
@@ -22,7 +22,7 @@ public class Doctor : EntityBase
     public void Deactivate()
     {
         IsActive = false;
-        UpdatedAt = DateTime.Now;
+        UpdateTimestamp();
     }
     public Doctor(string name, string licenseNumber, Speciality speciality, Guid? id = null) : base(id)
     {
@@ -31,11 +31,12 @@ public class Doctor : EntityBase
         Speciality = speciality;
     }
 
-    public void UpdateDoctor(string name, string licenseNumber, Guid? specialityId)
+    public void UpdateDoctor(string name, string licenseNumber, Guid specialityId)
     {
         Name = name;
         LicenseNumber = licenseNumber;
         SpecialityId = specialityId;
+        UpdateTimestamp();
     }
     public void UpdateDoctorAvailabilities(ICollection<Availability> availabilities)
     {
