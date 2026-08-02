@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2026Tpi.Data.Migrations.Identity
 {
     [DbContext(typeof(AuthenticationDbContext))]
-    [Migration("20260731045323_InitialModel")]
-    partial class InitialModel
+    [Migration("20260802044258_InitialIdentity")]
+    partial class InitialIdentity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -234,9 +234,6 @@ namespace Dsw2026Tpi.Data.Migrations.Identity
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
-
-                    b.Property<long?>("Dni")
-                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
