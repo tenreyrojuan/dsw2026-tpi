@@ -1,6 +1,9 @@
 ﻿using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
+using Dsw2026Tpi.CrossCutting.Identity;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
@@ -26,6 +29,7 @@ public class AuthenticationController : AppController
     [HttpPost("admin/login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [EnableRateLimiting(Policies.AdminRequestsPolicy)]
     public async Task<IActionResult> Login([FromBody] LoginAdminModel.Request request)
     {
         var result = await _authenticationService.LoginAdmin(request);
@@ -35,6 +39,7 @@ public class AuthenticationController : AppController
     [HttpPost("patient/login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [EnableRateLimiting(Policies.PatientRequestsPolicy)]
     public async Task<IActionResult> LoginPacient([FromBody] LoginPatientModel.Request request)
     {
         var result = await _authenticationService.LoginPatient(request);

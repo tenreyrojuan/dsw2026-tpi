@@ -3,11 +3,13 @@ using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
 [Route("api/appointment")]
 [Authorize(Policy = Policies.PatientPolicy)]
+[EnableRateLimiting(Policies.AppointmentRequestsPolicy)]
 public class AppointmentController : AppController
 {
     private readonly IAppointmentService _service;

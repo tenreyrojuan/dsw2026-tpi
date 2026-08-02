@@ -23,6 +23,7 @@ public class Program
 
             //Configuraciones personalizadas
             builder.AddSerilogConfiguration();
+            builder.Services.AddRateLimiting();
             builder.Services.AddAppIdentity();
             builder.Services.AddAppAuthentication(builder.Configuration);
             builder.Services.AddSwaggerConfiguration();
@@ -33,6 +34,14 @@ public class Program
             builder.Services.AddHealthChecks();
 
             var app = builder.Build();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+            app.UseRateLimiter();
+
+            app.UseRouting();
+
+            app.UseCors();
 
             app.UseSerilogRequestLogging();
 
@@ -48,8 +57,6 @@ public class Program
 
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors();
-            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.MapControllers();
             app.MapHealthChecks("/health-check");
