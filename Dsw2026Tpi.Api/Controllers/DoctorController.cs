@@ -52,18 +52,18 @@ public class DoctorController : AppController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateDoctor([FromRoute]Guid doctorId, [FromBody] DoctorModel.Request request)
+    public async Task<IActionResult> UpdateDoctor([FromRoute] Guid id, [FromBody] DoctorModel.Request request)
     {
-        await _service.UpdateDoctor(doctorId, request);
+        await _service.UpdateDoctor(id, request);
         return Ok();
     }
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteDoctor([FromRoute]Guid doctorId) 
+    public async Task<IActionResult> DeleteDoctor([FromRoute]Guid id) 
     {
-        await _service.DeleteDoctor(doctorId);
+        await _service.DeleteDoctor(id);
         return Ok();
     }
 }
