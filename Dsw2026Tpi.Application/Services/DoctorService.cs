@@ -32,7 +32,8 @@ public class DoctorService : IDoctorService
     public async Task<IEnumerable<DoctorAvailabilityModel.Response>> GetDoctorAvailabilities(Guid doctorId)
     {
         Doctor? doctor = await _persistence.GetById<Doctor>(doctorId)
-            ?? throw new EntityNotFoundException(nameof(Doctor));
+            ?? throw new EntityNotFoundException(nameof(Doctor))
+            .WithDetail(nameof(doctorId), Issue.ID_NOTFOUND);
 
         Expression<Func<Availability, bool>> predicate = a => a.DoctorId == doctorId
                                                          && a.Month == DateTime.Now.Month 
@@ -55,11 +56,12 @@ public class DoctorService : IDoctorService
     public async Task<DoctorModel.Response> AddDoctor(DoctorModel.Request request)
     {
         if (!request.Name.IsNameValid())
-            throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
-                .WithDetail(nameof(request.Name),ValidationErrors.INVALID_NAME);
+            throw new ValidationException()
+                .WithDetail(nameof(request.Name),Issue.INVALID_NAME);
         
-        var speciality = await _persistence.First<Speciality>(s => s.Id == request.SpecialityId) 
-            ?? throw new EntityNotFoundException(nameof(Speciality));
+        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId) 
+            ?? throw new EntityNotFoundException(nameof(Speciality))
+            .WithDetail(nameof(request.SpecialityId), Issue.ID_NOTFOUND);
 
         var newDoctor = await _persistence.Add<Doctor>(new Doctor(request.Name, request.LicenseNumber, speciality));
         return new DoctorModel.Response(newDoctor.Id, newDoctor.Name,newDoctor.LicenseNumber,
@@ -69,14 +71,16 @@ public class DoctorService : IDoctorService
     public async Task UpdateDoctor(Guid doctorId,DoctorModel.Request request)
     {
         if (!request.Name.IsNameValid())
-            throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
-                .WithDetail(nameof(request.Name),ValidationErrors.INVALID_NAME);
+            throw new ValidationException()
+                .WithDetail(nameof(request.Name),Issue.INVALID_NAME);
 
-        var doctor = await _persistence.GetById<Doctor>(doctorId, nameof(Speciality));        
-        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId);
+        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId)
+            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
+            .WithDetail(nameof(request.SpecialityId), Issue.ID_NOTFOUND);
 
-        if (speciality is null || doctor is null)
-            throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND);
+        var doctor = await _persistence.GetById<Doctor>(doctorId, nameof(Speciality))
+            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
+            .WithDetail(nameof(doctorId), Issue.ID_NOTFOUND);
 
         doctor.UpdateDoctor(request.Name, request.LicenseNumber, request.SpecialityId);
 
@@ -86,7 +90,8 @@ public class DoctorService : IDoctorService
     public async Task DeleteDoctor(Guid doctorId)
     {
         var doctor = await _persistence.GetById<Doctor>(doctorId) 
-            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND);
+            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
+            .WithDetail(nameof(doctorId), Issue.ID_NOTFOUND);
 
         _ = await _persistence.Delete<Doctor>(doctor);
     }
