@@ -16,7 +16,6 @@ public class AppointmentService : IAppointmentService
     {
         _persistence = persistence;
     }
-
     public async Task<AppointmentModel.Response> AddAppointment(AppointmentModel.Request request)
     {
         if (!request.Patient.Dni.IsDniValid())
@@ -87,4 +86,5 @@ public class AppointmentService : IAppointmentService
             appointment.Patient.FullName, appointment.TimeSlot.Date,
             appointment.TimeSlot.StartingTime);
     }
+
 }
