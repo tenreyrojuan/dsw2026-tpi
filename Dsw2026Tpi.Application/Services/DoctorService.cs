@@ -92,7 +92,7 @@ public class DoctorService : IDoctorService
         var doctor = await _persistence.GetById<Doctor>(doctorId) 
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
             .WithDetail(nameof(doctorId), Issue.ID_NOTFOUND);
-
-        _ = await _persistence.Delete<Doctor>(doctor);
+        doctor.SetDelete();
+        _ = await _persistence.Update<Doctor>(doctor);
     }
 }

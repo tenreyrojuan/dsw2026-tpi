@@ -58,7 +58,8 @@ public class SpecialityService : ISpecialityService
             ?? throw new EntityNotFoundException(nameof(Speciality))
             .WithDetail(nameof(id), Issue.ID_NOTFOUND);
 
-        _ = await _persistence.Delete<Speciality>(speciality);
+        speciality.SetDelete();
+        _ = await _persistence.Update<Speciality>(speciality);
     }
 
 }
