@@ -12,6 +12,11 @@ public abstract class EntityBase(Guid? id = null)
     public void SetDelete()
     {
         Deleted = true;
+        UpdateTimestamp();
+    }
+
+    public void UpdateTimestamp()
+    {
         UpdatedAt = DateTime.Now;
     }
 }

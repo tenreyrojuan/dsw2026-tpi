@@ -1,6 +1,6 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 //Disponibilidad
-public class Availability : EntityBase
+public sealed class Availability : EntityBase
 {
     public int Month { get; init; }
     public int Year { get; init; }
@@ -37,11 +37,12 @@ public class Availability : EntityBase
         WeekDay = weekDay;
         StartingHour = startingHour;
         EndingHour = endingHour;
+        UpdateTimestamp();
     }
 
-    public bool HasOverlappingSchedules(TimeOnly startingHour, TimeOnly endingHour)
+    public bool HasOverlappingSchedules(TimeOnly requestedStart, TimeOnly requestedEnd)
     {
-        return startingHour < EndingHour && StartingHour < endingHour;
+        return requestedStart < EndingHour && StartingHour < requestedEnd;
     }
 
     public void GenerateMonthlyTimeSlots(int startingDay)

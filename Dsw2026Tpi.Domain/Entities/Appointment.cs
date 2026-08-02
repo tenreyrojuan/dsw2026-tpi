@@ -1,6 +1,6 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 //Cita
-public class Appointment : EntityBase
+public sealed class Appointment : EntityBase
 {
     public string Reason { get; private set; }
 
@@ -9,8 +9,8 @@ public class Appointment : EntityBase
     public AppointmentState AppointmentState { get; private set; }
     public Guid PatientId { get; init; }
     public Guid TimeSlotId { get; init; }
-    public Patient Patient { get; private set; }
-    public TimeSlot TimeSlot { get; private set; }
+    public Patient Patient { get; init; }
+    public TimeSlot TimeSlot { get; init; }
 
     #region Constructor for EF
 #pragma warning disable CS8618
@@ -30,13 +30,16 @@ public class Appointment : EntityBase
 
     public void Cancel()
     {
-        AppointmentState = AppointmentState.CANCELED;
+        AppointmentState = AppointmentState.CANCELLED;
         CancelledAt = DateTime.Now;
+        TimeSlot.Release();
+        UpdateTimestamp();
     }
     
     public void Complete()
     {
         AppointmentState = AppointmentState.ATTENDED;
         AttendedAt = DateTime.Now;
+        UpdateTimestamp();
     }
 }

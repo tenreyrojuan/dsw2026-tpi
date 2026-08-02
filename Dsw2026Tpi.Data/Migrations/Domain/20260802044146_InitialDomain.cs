@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Dsw2026Tpi.Data.Migrations.Domain
 {
     /// <inheritdoc />
-    public partial class InitialModel : Migration
+    public partial class InitialDomain : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,8 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Dni = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Deleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
@@ -50,7 +51,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LicenseNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    SpecialityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SpecialityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -101,7 +102,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     StartingTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     EndingTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    TimeSlotState = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    TimeSlotState = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     AvailabilityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -123,10 +124,10 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Reason = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     AttendedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CancelledAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    AppointmentState = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    AppointmentState = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     PatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TimeSlotId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -182,6 +183,12 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 name: "IX_Patients_Dni",
                 table: "Patients",
                 column: "Dni",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Patients_UserId",
+                table: "Patients",
+                column: "UserId",
                 unique: true);
 
             migrationBuilder.CreateIndex(

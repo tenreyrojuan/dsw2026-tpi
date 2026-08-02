@@ -22,7 +22,7 @@ public class TimeSlotConfiguration : IEntityTypeConfiguration<TimeSlot>
 
         builder.Property(t => t.TimeSlotState)
                .HasConversion<string>()
-               .HasMaxLength(30)
+               .HasMaxLength(20)
                .IsRequired();
 
         builder.HasOne(t => t.Availability)

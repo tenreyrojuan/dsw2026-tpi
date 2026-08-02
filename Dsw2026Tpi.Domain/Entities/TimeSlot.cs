@@ -1,6 +1,6 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 //Turno
-public class TimeSlot : EntityBase
+public sealed class TimeSlot : EntityBase
 {
     public DateOnly Date { get; private set; }
     public TimeOnly StartingTime { get; private set; }
@@ -31,13 +31,17 @@ public class TimeSlot : EntityBase
         Availability = availability;
         TimeSlotState = TimeSlotState.AVAILABLE;
     }
-    public void ChangeState(TimeSlotState newState)
-    {
-        TimeSlotState = newState;
-    }
+
     public void Book(Appointment appointment)
     {
         Appointment = appointment;
         TimeSlotState = TimeSlotState.BOOKED;
+        UpdateTimestamp();
+    }
+
+    public void Release()
+    {
+        TimeSlotState = TimeSlotState.AVAILABLE;
+        UpdateTimestamp();
     }
 }

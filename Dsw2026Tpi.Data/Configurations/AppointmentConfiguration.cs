@@ -14,11 +14,11 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
         builder.Property(a => a.Deleted).HasDefaultValue(false);
         builder.HasQueryFilter(a => !a.Deleted);
 
-        builder.Property(a => a.Reason).HasMaxLength(100).IsRequired();
+        builder.Property(a => a.Reason).HasMaxLength(300).IsRequired();
 
         builder.Property(a => a.AppointmentState)
                .HasConversion<string>()
-               .HasMaxLength(30)
+               .HasMaxLength(20)
                .IsRequired();
 
         builder.HasOne(a => a.Patient)
@@ -30,5 +30,7 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
                .WithOne(t => t.Appointment)
                .HasForeignKey<Appointment>(a => a.TimeSlotId)
                .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(a => a.TimeSlotId).IsUnique();
     }
 }

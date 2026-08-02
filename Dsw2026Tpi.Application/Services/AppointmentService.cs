@@ -55,7 +55,7 @@ public class AppointmentService : IAppointmentService
         var newAppointment = new Appointment(patient, timeSlot, request.Reason);
         var appointment = await _persistence.Add<Appointment>(newAppointment);
 
-        return new AppointmentModel.Response(appointment.Patient.Name, today, timeSlot.StartingTime);
+        return new AppointmentModel.Response(appointment.Patient.FullName, today, timeSlot.StartingTime);
     }
 
     public async Task<IEnumerable<AppointmentModel.Response>> GetPatientAppointment(string dni)
@@ -66,7 +66,7 @@ public class AppointmentService : IAppointmentService
         
         return appointment is null ? [] : 
             appointment.Select(a => new AppointmentModel.Response(
-                a.Patient.Name, a.TimeSlot.Date, a.TimeSlot.StartingTime));
+                a.Patient.FullName, a.TimeSlot.Date, a.TimeSlot.StartingTime));
     }
 
     public async Task<AppointmentModel.Response> DeleteAppointment (Guid availabilityTimeSlotid)
@@ -84,7 +84,7 @@ public class AppointmentService : IAppointmentService
         appointment = await _persistence.Delete<Appointment>(appointment);
 
         return new AppointmentModel.Response(
-            appointment.Patient.Name, appointment.TimeSlot.Date,
+            appointment.Patient.FullName, appointment.TimeSlot.Date,
             appointment.TimeSlot.StartingTime);
     }
 }
