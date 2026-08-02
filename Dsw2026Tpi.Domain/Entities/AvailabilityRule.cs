@@ -1,6 +1,6 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 //Disponibilidad
-public sealed class Availability : EntityBase
+public sealed class AvailabilityRule : EntityBase
 {
     public int Month { get; init; }
     public int Year { get; init; }
@@ -12,16 +12,16 @@ public sealed class Availability : EntityBase
     public Guid DoctorId { get; private set; }
     public Doctor Doctor { get; private set; }
 
-    public ICollection<TimeSlot> TimeSlots { get; private set; } = [];
+    public ICollection<AvailabilitySlot> AvailabilitySlots { get; private set; } = [];
 
     #region Constructor for EF
 #pragma warning disable CS8618
-    private Availability()
+    private AvailabilityRule()
     {
     }
 #pragma warning restore CS8618
     #endregion
-    public Availability(int month, int year, DayOfWeek weekDay, TimeOnly startingHour,
+    public AvailabilityRule(int month, int year, DayOfWeek weekDay, TimeOnly startingHour,
         TimeOnly endingHour, Doctor doctor, Guid? id = null) : base(id)
     {
         Month = month;
@@ -45,7 +45,7 @@ public sealed class Availability : EntityBase
         return requestedStart < EndingHour && StartingHour < requestedEnd;
     }
 
-    public void GenerateMonthlyTimeSlots(int startingDay)
+    public void GenerateMonthlyAvailabilitySlots(int startingDay)
     {
         var date = new DateOnly(Year, Month, startingDay);
         //busca el primer dia del mes que coincida con el dia de semana presente en el array del request
@@ -57,23 +57,23 @@ public sealed class Availability : EntityBase
         //crea los turnos diarios para el dia solicitado, saltando de a 7 dias hasta que termina el mes.
         while (date.Month == Month)
         {
-            CreateDailyTimeSlots(date);
+            CreateDailyAvailabilitySlots(date);
             date = date.AddDays(7);
         }
     }
 
-    private void CreateDailyTimeSlots(DateOnly date)
+    private void CreateDailyAvailabilitySlots(DateOnly date)
     {
         var currentStart = StartingHour;
 
         while (currentStart < EndingHour)
         {
-            var currentEnd = currentStart.AddMinutes(TimeSlot.SlotDurationMinutes);
+            var currentEnd = currentStart.AddMinutes(AvailabilitySlot.SlotDurationMinutes);
 
             if (currentEnd > EndingHour)
                 break;
 
-            TimeSlots.Add(new TimeSlot(date, currentStart, currentEnd, this));
+            AvailabilitySlots.Add(new AvailabilitySlot(date, currentStart, currentEnd, this));
 
             currentStart = currentEnd;
         }

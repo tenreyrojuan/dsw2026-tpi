@@ -26,7 +26,7 @@ public class AvailabilityService : IAvailabilityService
         var currentMonth = now.Month;
         var currentYear = now.Year;
 
-        ICollection<Availability> finalAvailabilities = CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear,now);
+        ICollection<AvailabilityRule> finalAvailabilities = CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear,now);
         
         var disps = await _persistence.AddRange(finalAvailabilities);
 
@@ -51,7 +51,7 @@ public class AvailabilityService : IAvailabilityService
 
         doctor.UpdateDoctorAvailabilities(availabilitiesToKeep);
 
-        ICollection<Availability> finalAvailabilities = 
+        ICollection<AvailabilityRule> finalAvailabilities = 
             CreateFinalAvailabilities(request.Days,doctor,currentMonth,currentYear,now);
 
         var disps = await _persistence.AddRange(finalAvailabilities);
@@ -61,13 +61,13 @@ public class AvailabilityService : IAvailabilityService
             new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));
 
     }
-    private ICollection<Availability> CreateFinalAvailabilities(
+    private ICollection<AvailabilityRule> CreateFinalAvailabilities(
         IEnumerable<AvailabilityModel.DayScheduleRequest> days,
         Doctor doctor,
         int currentMonth, int currentYear,
         DateTime now)
     {
-        List<Availability> createdAvailabilities = new List<Availability>();
+        List<AvailabilityRule> createdAvailabilities = new List<AvailabilityRule>();
         foreach (var day in days)
         {
             if (day.StartTime >= day.EndTime)
@@ -86,11 +86,11 @@ public class AvailabilityService : IAvailabilityService
                 throw new ConflictException()
                     .WithDetail(nameof(hasOverlap), Issue.OVERLAP);
 
-            var availability = new Availability(currentMonth, currentYear, weekDay, day.StartTime, day.EndTime, doctor);
+            var availabilityRule = new AvailabilityRule(currentMonth, currentYear, weekDay, day.StartTime, day.EndTime, doctor);
 
-            availability.GenerateMonthlyTimeSlots(now.Day);
+            availabilityRule.GenerateMonthlyAvailabilitySlots(now.Day);
 
-            createdAvailabilities.Add(availability);
+            createdAvailabilities.Add(availabilityRule);
         }
         return createdAvailabilities;
     }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2026Tpi.Data.Migrations.Identity
 {
     [DbContext(typeof(AuthenticationDbContext))]
-    [Migration("20260802044258_InitialIdentity")]
+    [Migration("20260802215806_InitialIdentity")]
     partial class InitialIdentity
     {
         /// <inheritdoc />

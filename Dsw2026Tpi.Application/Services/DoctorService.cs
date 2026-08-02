@@ -35,11 +35,11 @@ public class DoctorService : IDoctorService
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
             .WithDetail(nameof(doctorId), Issue.ID_NOTFOUND);
 
-        Expression<Func<Availability, bool>> predicate = a => a.DoctorId == doctorId
+        Expression<Func<AvailabilityRule, bool>> predicate = a => a.DoctorId == doctorId
                                                          && a.Month == DateTime.Now.Month 
                                                          && a.Year == DateTime.Now.Year;
                                                          
-        var availabilities = await _persistence.GetFiltered<Availability>(predicate); 
+        var availabilities = await _persistence.GetFiltered<AvailabilityRule>(predicate); 
         
         // si no hay disponibilidades, se devuelve una lista vacia
         return availabilities is null? [] : 
@@ -64,11 +64,11 @@ public class DoctorService : IDoctorService
             throw new ConflictException()
                 .WithDetail(nameof(request.LicenseNumber),Issue.DUPLICATE_LICENCE);
 
-        var Specialty = await _persistence.GetById<Specialty>(request.SpecialtyId) 
+        var specialty = await _persistence.GetById<Specialty>(request.SpecialtyId) 
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
             .WithDetail(nameof(request.SpecialtyId), Issue.ID_NOTFOUND);
 
-        var newDoctor = await _persistence.Add<Doctor>(new Doctor(request.Name, request.LicenseNumber, Specialty));
+        var newDoctor = await _persistence.Add<Doctor>(new Doctor(request.Name, request.LicenseNumber, specialty));
         return new DoctorModel.Response(newDoctor.Id, newDoctor.Name,newDoctor.LicenseNumber,
             new DoctorModel.SpecialtyDto(newDoctor.Specialty?.Id, newDoctor.Specialty?.Name));
     }
