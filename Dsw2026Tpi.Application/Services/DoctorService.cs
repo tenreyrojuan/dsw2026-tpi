@@ -23,10 +23,10 @@ public class DoctorService : IDoctorService
     {
         var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, 
                                                    d => d.IsActive == true && (string.IsNullOrWhiteSpace(name) ||
-                                                   d.Name.Contains(name)), x => x.Name, nameof(Doctor.Speciality));
+                                                   d.Name.Contains(name)), x => x.Name, nameof(Doctor.Specialty));
         
         return doctors.Map(d => new DoctorModel.Response(d.Id, d.Name, d.LicenseNumber,
-            new DoctorModel.SpecialityDto(d.Speciality?.Id, d.Speciality?.Name)));
+            new DoctorModel.SpecialtyDto(d.Specialty?.Id, d.Specialty?.Name)));
     }
 
     public async Task<IEnumerable<DoctorAvailabilityModel.Response>> GetDoctorAvailabilities(Guid doctorId)
@@ -59,13 +59,13 @@ public class DoctorService : IDoctorService
             throw new ValidationException()
                 .WithDetail(nameof(request.Name),Issue.INVALID_NAME);
         
-        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId) 
-            ?? throw new EntityNotFoundException(nameof(Speciality))
-            .WithDetail(nameof(request.SpecialityId), Issue.ID_NOTFOUND);
+        var specialty = await _persistence.GetById<Specialty>(request.SpecialtyId) 
+            ?? throw new EntityNotFoundException(nameof(Specialty))
+            .WithDetail(nameof(request.SpecialtyId), Issue.ID_NOTFOUND);
 
-        var newDoctor = await _persistence.Add<Doctor>(new Doctor(request.Name, request.LicenseNumber, speciality));
+        var newDoctor = await _persistence.Add<Doctor>(new Doctor(request.Name, request.LicenseNumber, specialty));
         return new DoctorModel.Response(newDoctor.Id, newDoctor.Name,newDoctor.LicenseNumber,
-            new DoctorModel.SpecialityDto(newDoctor.Speciality?.Id, newDoctor.Speciality?.Name));
+            new DoctorModel.SpecialtyDto(newDoctor.Specialty?.Id, newDoctor.Specialty?.Name));
     }
 
     public async Task UpdateDoctor(Guid doctorId,DoctorModel.Request request)
@@ -74,15 +74,15 @@ public class DoctorService : IDoctorService
             throw new ValidationException()
                 .WithDetail(nameof(request.Name),Issue.INVALID_NAME);
 
-        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId)
+        var specialty = await _persistence.GetById<Specialty>(request.SpecialtyId)
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
-            .WithDetail(nameof(request.SpecialityId), Issue.ID_NOTFOUND);
+            .WithDetail(nameof(request.SpecialtyId), Issue.ID_NOTFOUND);
 
-        var doctor = await _persistence.GetById<Doctor>(doctorId, nameof(Speciality))
+        var doctor = await _persistence.GetById<Doctor>(doctorId, nameof(Specialty))
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
             .WithDetail(nameof(doctorId), Issue.ID_NOTFOUND);
 
-        doctor.UpdateDoctor(request.Name, request.LicenseNumber, request.SpecialityId);
+        doctor.UpdateDoctor(request.Name, request.LicenseNumber, request.SpecialtyId);
 
         _ = await _persistence.Update<Doctor>(doctor);
     }

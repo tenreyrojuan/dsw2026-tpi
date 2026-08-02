@@ -8,24 +8,24 @@ using Dsw2026Tpi.Domain.Interfaces;
 
 namespace Dsw2026Tpi.Application.Services;
 
-public class SpecialityService : ISpecialityService
+public class SpecialtyService : ISpecialtyService
 {
     private readonly IPersistence _persistence;
 
-    public SpecialityService(IPersistence persistence)
+    public SpecialtyService(IPersistence persistence)
     {
         _persistence = persistence;
     }
-    public async Task<Pagination<SpecialityModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
+    public async Task<Pagination<SpecialtyModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
-        var specialities = await _persistence.Paginate<Speciality, string>(pageSize, pageIndex,
+        var specialties = await _persistence.Paginate<Specialty, string>(pageSize, pageIndex,
                                                    e => e.Deleted == false && (string.IsNullOrWhiteSpace(name) ||
                                                    e.Name.Contains(name)), x => x.Name);
 
-        return specialities.Map(e => new SpecialityModel.Response(e.Id, e.Name, e.Description));
+        return specialties.Map(e => new SpecialtyModel.Response(e.Id, e.Name, e.Description));
     }
 
-    public async Task AddSpeciality(string name, string description)
+    public async Task AddSpecialty(string name, string description)
     {
         if (!name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
@@ -33,33 +33,33 @@ public class SpecialityService : ISpecialityService
         if (!description.IsDescriptionValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
                 .WithDetail(nameof(description), Issue.INVALID_DESCRIPTION);
-        var speciality= new Speciality(name, description);
-        _ = await _persistence.Add<Speciality>(speciality);
+        var specialty= new Specialty(name, description);
+        _ = await _persistence.Add<Specialty>(specialty);
     }
     
-    public async Task UpdateSpeciality(Guid id, string name, string description)
+    public async Task UpdateSpecialty(Guid id, string name, string description)
     {
         if (!name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
                 .WithDetail(nameof(name),Issue.INVALID_NAME);
 
-        var speciality = await _persistence.GetById<Speciality>(id)
-            ?? throw new EntityNotFoundException(nameof(Speciality))
+        var specialty = await _persistence.GetById<Specialty>(id)
+            ?? throw new EntityNotFoundException(nameof(Specialty))
             .WithDetail(nameof(id), Issue.ID_NOTFOUND);
 
-        speciality.UpdateSpeciality(name, description);
+        specialty.UpdateSpecialty(name, description);
 
-        _ = await _persistence.Update<Speciality>(speciality);
+        _ = await _persistence.Update<Specialty>(specialty);
     }
     
-    public async Task DeleteSpeciality(Guid id)
+    public async Task DeleteSpecialty(Guid id)
     {
-        var speciality = await _persistence.GetById<Speciality>(id)
-            ?? throw new EntityNotFoundException(nameof(Speciality))
+        var specialty = await _persistence.GetById<Specialty>(id)
+            ?? throw new EntityNotFoundException(nameof(Specialty))
             .WithDetail(nameof(id), Issue.ID_NOTFOUND);
 
-        speciality.SetDelete();
-        _ = await _persistence.Update<Speciality>(speciality);
+        specialty.SetDelete();
+        _ = await _persistence.Update<Specialty>(specialty);
     }
 
 }

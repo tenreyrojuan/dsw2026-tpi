@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
-[Route("api/specialities")]
+[Route("api/specialties")]
 [Authorize(Policy = Policies.AdminPolicy)]
-public class SpecialityController : AppController
+public class SpecialtyController : AppController
 {
-    private readonly ISpecialityService _service;
+    private readonly ISpecialtyService _service;
 
-    public SpecialityController(ISpecialityService service)
+    public SpecialtyController(ISpecialtyService service)
     {
         _service = service;
     }
@@ -29,9 +29,9 @@ public class SpecialityController : AppController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AddSpeciality([FromBody] SpecialityModel.Request request)
+    public async Task<IActionResult> AddSpecialty([FromBody] SpecialtyModel.Request request)
     {
-        await _service.AddSpeciality(request.Name, request.Description);
+        await _service.AddSpecialty(request.Name, request.Description);
         return Ok();
     }
 
@@ -39,18 +39,18 @@ public class SpecialityController : AppController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateSpeciality([FromRoute] Guid id, [FromBody] SpecialityModel.Request request)
+    public async Task<IActionResult> UpdateSpecialty([FromRoute] Guid id, [FromBody] SpecialtyModel.Request request)
     {
-        await _service.UpdateSpeciality(id, request.Name, request.Description);
+        await _service.UpdateSpecialty(id, request.Name, request.Description);
         return Ok();
     }
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteSpeciality([FromRoute] Guid id)
+    public async Task<IActionResult> DeleteSpecialty([FromRoute] Guid id)
     {
-        await _service.DeleteSpeciality(id);
+        await _service.DeleteSpecialty(id);
         return Ok();
     }
 }

@@ -21,9 +21,9 @@ public class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
         builder.Property(d => d.LicenseNumber).HasMaxLength(20).IsRequired();
         builder.HasIndex(d => d.LicenseNumber).IsUnique();
 
-        builder.HasOne(d => d.Speciality)
+        builder.HasOne(d => d.Specialty)
             .WithMany()
-            .HasForeignKey(d => d.SpecialityId)
+            .HasForeignKey(d => d.SpecialtyId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

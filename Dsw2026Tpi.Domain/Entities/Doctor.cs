@@ -4,8 +4,8 @@ public sealed class Doctor : EntityBase
 {
     public string Name { get; private set; }
     public string LicenseNumber { get; private set; }
-    public Guid SpecialityId { get; private set; }
-    public Speciality Speciality { get; private set; }
+    public Guid SpecialtyId { get; private set; }
+    public Specialty Specialty { get; private set; }
 
     public ICollection<Availability> Availabilities { get; private set; } = [];
 
@@ -24,18 +24,18 @@ public sealed class Doctor : EntityBase
         IsActive = false;
         UpdateTimestamp();
     }
-    public Doctor(string name, string licenseNumber, Speciality speciality, Guid? id = null) : base(id)
+    public Doctor(string name, string licenseNumber, Specialty specialty, Guid? id = null) : base(id)
     {
         Name = name;
         LicenseNumber = licenseNumber;
-        Speciality = speciality;
+        Specialty = specialty;
     }
 
-    public void UpdateDoctor(string name, string licenseNumber, Guid specialityId)
+    public void UpdateDoctor(string name, string licenseNumber, Guid specialtyId)
     {
         Name = name;
         LicenseNumber = licenseNumber;
-        SpecialityId = specialityId;
+        SpecialtyId = specialtyId;
         UpdateTimestamp();
     }
     public void UpdateDoctorAvailabilities(ICollection<Availability> availabilities)
