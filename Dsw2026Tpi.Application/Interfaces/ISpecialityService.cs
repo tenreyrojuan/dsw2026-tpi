@@ -7,9 +7,9 @@ public interface ISpecialtyService
 {
     Task<Pagination<SpecialtyModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null);
 
-    Task AddSpecialty(string name, string description);
+    Task<SpecialtyModel.Response>AddSpecialty(string name, string description);
 
-    Task UpdateSpecialty(Guid id, string name, string description);
+    Task<SpecialtyModel.Response>UpdateSpecialty(Guid id, string name, string description);
 
     Task DeleteSpecialty(Guid id);
 }

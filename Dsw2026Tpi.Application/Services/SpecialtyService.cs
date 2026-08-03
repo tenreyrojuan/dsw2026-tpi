@@ -25,7 +25,7 @@ public class SpecialtyService : ISpecialtyService
         return specialties.Map(e => new SpecialtyModel.Response(e.Id, e.Name, e.Description));
     }
 
-    public async Task AddSpecialty(string name, string description)
+    public async Task<SpecialtyModel.Response> AddSpecialty(string name, string description)
     {
         if (!name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
@@ -33,11 +33,14 @@ public class SpecialtyService : ISpecialtyService
         if (!description.IsDescriptionValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
                 .WithDetail(nameof(description), Issue.INVALID_DESCRIPTION);
-        var specialty= new Specialty(name, description);
-        _ = await _persistence.Add<Specialty>(specialty);
+        
+        var specialty = new Specialty(name, description);
+        var created = await _persistence.Add<Specialty>(specialty);
+        
+        return new SpecialtyModel.Response(created.Id, created.Name, created.Description);
     }
     
-    public async Task UpdateSpecialty(Guid id, string name, string description)
+    public async Task<SpecialtyModel.Response>UpdateSpecialty(Guid id, string name, string description)
     {
         if (!name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
@@ -49,7 +52,8 @@ public class SpecialtyService : ISpecialtyService
 
         specialty.UpdateSpecialty(name, description);
 
-        _ = await _persistence.Update<Specialty>(specialty);
+        var updated = await _persistence.Update<Specialty>(specialty);
+        return new SpecialtyModel.Response(updated.Id, updated.Name, updated.Description);
     }
     
     public async Task DeleteSpecialty(Guid id)
