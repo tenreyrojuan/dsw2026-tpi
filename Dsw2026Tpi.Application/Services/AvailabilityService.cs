@@ -26,7 +26,8 @@ public class AvailabilityService : IAvailabilityService
         var currentMonth = now.Month;
         var currentYear = now.Year;
 
-        ICollection<AvailabilityRule> finalAvailabilities = CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear,now);
+        ICollection<AvailabilityRule> finalAvailabilities 
+            = CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear,now);
         
         var disps = await _persistence.AddRange(finalAvailabilities);
 
@@ -45,11 +46,11 @@ public class AvailabilityService : IAvailabilityService
         var currentMonth = now.Month;
         var currentYear = now.Year;
 
-        var availabilitiesToKeep = doctor.AvailabilityRules
-            .Where(a => a.Month != currentMonth || a.Year != currentYear)
-            .ToArray();
-
-        doctor.UpdateDoctorAvailabilities(availabilitiesToKeep);
+        // se listan las disponibilidades que son de este mes, este año y ademas no tienen slots ocupados
+        var availabilitiesToDelete = doctor.AvailabilityRules
+           .Where(a => a.Month == currentMonth && a.Year == currentYear && !a.AvailabilitySlots.Any(s => s.AvailabilitySlotState == AvailabilitySlotState.BOOKED))
+           .ToArray();
+        _ = await _persistence.RemoveRange<AvailabilityRule>(availabilitiesToDelete);
 
         ICollection<AvailabilityRule> finalAvailabilities = 
             CreateFinalAvailabilities(request.Days,doctor,currentMonth,currentYear,now);
@@ -67,7 +68,7 @@ public class AvailabilityService : IAvailabilityService
         int currentMonth, int currentYear,
         DateTime now)
     {
-        List<AvailabilityRule> createdAvailabilities = new List<AvailabilityRule>();
+        ICollection<AvailabilityRule> createdAvailabilities = [];
         foreach (var day in days)
         {
             if (day.StartTime >= day.EndTime)
