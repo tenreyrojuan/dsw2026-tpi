@@ -18,7 +18,7 @@ public class AvailabilityService : IAvailabilityService
 
     public async Task<AvailabilityModel.Response> AddAvailability(AvailabilityModel.Request request)
     {
-        Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.Availabilities))
+        Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.AvailabilityRules))
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
             .WithDetail(nameof(request.DoctorId), Issue.ID_NOTFOUND);
 
@@ -37,7 +37,7 @@ public class AvailabilityService : IAvailabilityService
 
     public async Task<AvailabilityModel.Response> UpdateAvailability(AvailabilityModel.Request request)
     {
-        Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.Availabilities))
+        Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.AvailabilityRules))
             ?? throw new EntityNotFoundException(nameof(Doctor))
             .WithDetail(nameof(request.DoctorId), Issue.ID_NOTFOUND);
 
@@ -45,7 +45,7 @@ public class AvailabilityService : IAvailabilityService
         var currentMonth = now.Month;
         var currentYear = now.Year;
 
-        var availabilitiesToKeep = doctor.Availabilities
+        var availabilitiesToKeep = doctor.AvailabilityRules
             .Where(a => a.Month != currentMonth || a.Year != currentYear)
             .ToArray();
 
@@ -76,7 +76,7 @@ public class AvailabilityService : IAvailabilityService
 
             DayOfWeek weekDay = ParseDayOfWeek(day.Day);
 
-            bool hasOverlap = doctor.Availabilities.Any(a =>
+            bool hasOverlap = doctor.AvailabilityRules.Any(a =>
             a.Month == currentMonth &&
             a.Year == currentYear &&
             a.WeekDay == weekDay &&

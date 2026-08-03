@@ -4,16 +4,19 @@ using Dsw2026Tpi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Dsw2026Tpi.Data.Migrations.Domain
+namespace Dsw2026Tpi.Data.Migrations
 {
     [DbContext(typeof(Dsw2026TpiDbContext))]
-    partial class Dsw2026TpiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260803050455_InitialDomain")]
+    partial class InitialDomain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,16 +114,13 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                     b.HasIndex("DoctorId", "Year", "Month", "WeekDay", "StartingHour", "EndingHour")
                         .IsUnique();
 
-                    b.ToTable("Availabilities", (string)null);
+                    b.ToTable("AvailabilityRules", (string)null);
                 });
 
             modelBuilder.Entity("Dsw2026Tpi.Domain.Entities.AvailabilitySlot", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("AvailabilityId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("AvailabilityRuleId")
@@ -301,7 +301,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
             modelBuilder.Entity("Dsw2026Tpi.Domain.Entities.AvailabilityRule", b =>
                 {
                     b.HasOne("Dsw2026Tpi.Domain.Entities.Doctor", "Doctor")
-                        .WithMany("Availabilities")
+                        .WithMany("AvailabilityRules")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -343,7 +343,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
 
             modelBuilder.Entity("Dsw2026Tpi.Domain.Entities.Doctor", b =>
                 {
-                    b.Navigation("Availabilities");
+                    b.Navigation("AvailabilityRules");
                 });
 
             modelBuilder.Entity("Dsw2026Tpi.Domain.Entities.Patient", b =>
