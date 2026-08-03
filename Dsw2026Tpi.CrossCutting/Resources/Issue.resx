@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="INVALID_DNI" xml:space="preserve">
-    <value>El DNI es inválido. El campo debe contener entre 7 y 10 números.</value>
+    <value>El DNI es inválido. El campo debe contener entre 7 y 8 números.</value>
   </data>
   <data name="ID_NOTFOUND" xml:space="preserve">
     <value>El ID no corresponde a una entidad registrada.</value>
@@ -164,5 +164,8 @@
   </data>
   <data name="DUPLICATE_DNI" xml:space="preserve">
     <value>El DNI ya existe en el sistema</value>
+  </data>
+  <data name="DUPLICATE_LICENCE" xml:space="preserve">
+    <value>Ya existe un medico con la licencia ingresada. Ingrese una distinta.</value>
   </data>
 </root>

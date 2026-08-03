@@ -3,13 +3,13 @@ using Dsw2026Tpi.Domain.Entities;
 
 namespace Dsw2026Tpi.Application.Interfaces;
 
-public interface ISpecialityService
+public interface ISpecialtyService
 {
-    Task<Pagination<SpecialityModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null);
+    Task<Pagination<SpecialtyModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null);
 
-    Task AddSpeciality(string name, string description);
+    Task<SpecialtyModel.Response>AddSpecialty(string name, string description);
 
-    Task UpdateSpeciality(Guid id, string name, string description);
+    Task<SpecialtyModel.Response>UpdateSpecialty(Guid id, string name, string description);
 
-    Task DeleteSpeciality(Guid id);
+    Task DeleteSpecialty(Guid id);
 }

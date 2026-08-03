@@ -88,6 +88,15 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Ya existe un medico con la licencia ingresada. Ingrese una distinta..
+        /// </summary>
+        public static string DUPLICATE_LICENCE {
+            get {
+                return ResourceManager.GetString("DUPLICATE_LICENCE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El Email no se encontró..
         /// </summary>
         public static string EMAIL_ERROR {
@@ -124,7 +133,7 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a El DNI es inválido. El campo debe contener entre 7 y 10 números..
+        ///   Busca una cadena traducida similar a El DNI es inválido. El campo debe contener entre 7 y 8 números..
         /// </summary>
         public static string INVALID_DNI {
             get {

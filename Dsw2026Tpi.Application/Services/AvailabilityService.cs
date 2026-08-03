@@ -5,6 +5,7 @@ using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 using System.Numerics;
+using Dsw2026Tpi.Data.Extensions;
 
 namespace Dsw2026Tpi.Application.Services;
 
@@ -18,7 +19,7 @@ public class AvailabilityService : IAvailabilityService
 
     public async Task<AvailabilityModel.Response> AddAvailability(AvailabilityModel.Request request)
     {
-        Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.Availabilities))
+        Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.AvailabilityRules))
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
             .WithDetail(nameof(request.DoctorId), Issue.ID_NOTFOUND);
 
@@ -26,7 +27,8 @@ public class AvailabilityService : IAvailabilityService
         var currentMonth = now.Month;
         var currentYear = now.Year;
 
-        ICollection<Availability> finalAvailabilities = CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear,now);
+        ICollection<AvailabilityRule> finalAvailabilities 
+            = CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear,now);
         
         var disps = await _persistence.AddRange(finalAvailabilities);
 
@@ -37,7 +39,7 @@ public class AvailabilityService : IAvailabilityService
 
     public async Task<AvailabilityModel.Response> UpdateAvailability(AvailabilityModel.Request request)
     {
-        Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.Availabilities))
+        Doctor? doctor = await _persistence.GetById<Doctor>(request.DoctorId, nameof(Doctor.AvailabilityRules))
             ?? throw new EntityNotFoundException(nameof(Doctor))
             .WithDetail(nameof(request.DoctorId), Issue.ID_NOTFOUND);
 
@@ -45,13 +47,13 @@ public class AvailabilityService : IAvailabilityService
         var currentMonth = now.Month;
         var currentYear = now.Year;
 
-        var availabilitiesToKeep = doctor.Availabilities
-            .Where(a => a.Month != currentMonth || a.Year != currentYear)
-            .ToArray();
+        // se listan las disponibilidades que son de este mes, este año y ademas no tienen slots ocupados
+        var availabilitiesToDelete = doctor.AvailabilityRules
+           .Where(a => a.Month == currentMonth && a.Year == currentYear && !a.AvailabilitySlots.Any(s => s.AvailabilitySlotState == AvailabilitySlotState.BOOKED))
+           .ToArray();
+        _ = await _persistence.RemoveRange<AvailabilityRule>(availabilitiesToDelete);
 
-        doctor.UpdateDoctorAvailabilities(availabilitiesToKeep);
-
-        ICollection<Availability> finalAvailabilities = 
+        ICollection<AvailabilityRule> finalAvailabilities = 
             CreateFinalAvailabilities(request.Days,doctor,currentMonth,currentYear,now);
 
         var disps = await _persistence.AddRange(finalAvailabilities);
@@ -61,13 +63,15 @@ public class AvailabilityService : IAvailabilityService
             new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));
 
     }
-    private ICollection<Availability> CreateFinalAvailabilities(
+    private ICollection<AvailabilityRule> CreateFinalAvailabilities(
         IEnumerable<AvailabilityModel.DayScheduleRequest> days,
         Doctor doctor,
         int currentMonth, int currentYear,
         DateTime now)
     {
-        List<Availability> createdAvailabilities = new List<Availability>();
+        var holidays = HolidaySeed.LoadHolidays();
+
+        ICollection<AvailabilityRule> createdAvailabilities = [];
         foreach (var day in days)
         {
             if (day.StartTime >= day.EndTime)
@@ -76,7 +80,7 @@ public class AvailabilityService : IAvailabilityService
 
             DayOfWeek weekDay = ParseDayOfWeek(day.Day);
 
-            bool hasOverlap = doctor.Availabilities.Any(a =>
+            bool hasOverlap = doctor.AvailabilityRules.Any(a =>
             a.Month == currentMonth &&
             a.Year == currentYear &&
             a.WeekDay == weekDay &&
@@ -86,11 +90,11 @@ public class AvailabilityService : IAvailabilityService
                 throw new ConflictException()
                     .WithDetail(nameof(hasOverlap), Issue.OVERLAP);
 
-            var availability = new Availability(currentMonth, currentYear, weekDay, day.StartTime, day.EndTime, doctor);
+            var availabilityRule = new AvailabilityRule(currentMonth, currentYear, weekDay, day.StartTime, day.EndTime, doctor);
 
-            availability.GenerateMonthlyTimeSlots(now.Day);
+            availabilityRule.GenerateMonthlyAvailabilitySlots(now.Day, holidays);
 
-            createdAvailabilities.Add(availability);
+            createdAvailabilities.Add(availabilityRule);
         }
         return createdAvailabilities;
     }

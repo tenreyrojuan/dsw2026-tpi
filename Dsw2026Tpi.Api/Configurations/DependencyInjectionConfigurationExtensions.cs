@@ -12,9 +12,10 @@ public static class DependencyInjectionConfigurationExtensions
     {
         services.AddScoped<IPersistence, PersistenceEf>();
         services.AddScoped<IDoctorService, DoctorService>();
-        services.AddScoped<ISpecialityService, SpecialityService>();
+        services.AddScoped<ISpecialtyService, SpecialtyService>();
         services.AddScoped<IAvailabilityService, AvailabilityService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IAdvancedSearchesService, AdvancedSearchesService>();
         services.AddScoped<ISignInService, SignInService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddSingleton<JwtService>();

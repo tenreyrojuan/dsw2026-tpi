@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
-[Route("api/appointment")]
+[Route("api/appointments")]
 [Authorize(Policy = Policies.PatientPolicy)]
 [EnableRateLimiting(Policies.AppointmentRequestsPolicy)]
 public class AppointmentController : AppController
@@ -29,7 +29,7 @@ public class AppointmentController : AppController
         return Ok(result);
     }
 
-    [HttpGet]
+    [HttpGet("patient")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -42,7 +42,7 @@ public class AppointmentController : AppController
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteSpeciality([FromRoute] Guid id)
+    public async Task<IActionResult> DeleteAppointment([FromRoute] Guid id)
     {
         var result = await _service.DeleteAppointment(id);
         return Ok(result);

@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace Dsw2026Tpi.Data;
 
-public class PersistenceEf: IPersistence
+public class PersistenceEf : IPersistence
 {
     private readonly Dsw2026TpiDbContext _context;
 
@@ -48,10 +48,33 @@ public class PersistenceEf: IPersistence
     {
         return await Include(_context.Set<T>(), include).Where(predicate).ToListAsync();
     }
+    /// <summary>
+    /// Sirve para verificar la existe de alguna entidad sin traerla a la memoria.
+    /// Surge de la necesidad de verificar la existencia de alguna entidad que no se va a usar mas adelante
+    /// Nota: previamente se utilizaba GetById o First para verificar la existencia
+    /// </summary>
+    public async Task<bool> Any<T> (Expression<Func<T,bool>> predicate) where T : EntityBase
+    {
+        return await _context.Set<T>().AnyAsync(predicate);
+    }
+    /// <summary>
+    /// Metodo de añadir y eliminar colecciones 
+    /// Surge de la necesidad de poder actualizar las colecciones de una entidad
+    /// sin hacer ciclos de eliminacion costosos (debido a las llamadas constantes a SaveChanges).
+    /// 
+    /// Nota: cambiar las disponibilidades del medico y actualizar no funciona. 
+    /// Al parecer EF no trackeaba los cambios de la coleccion
+    /// </summary>
 
     public async Task<IEnumerable<T>> AddRange<T>(IEnumerable<T> entities) where T : EntityBase
     {
         await _context.AddRangeAsync(entities);
+        await _context.SaveChangesAsync();
+        return entities;
+    }
+    public async Task<IEnumerable<T>> RemoveRange<T>(IEnumerable<T> entities) where T : EntityBase
+    {
+        _context.RemoveRange(entities); // no existe RemoveRangeAsync????
         await _context.SaveChangesAsync();
         return entities;
     }
@@ -72,16 +95,16 @@ public class PersistenceEf: IPersistence
 
         var total = await filtered.CountAsync();
 
-        
+
         async Task<Pagination<T>> GetPage(int skip, int take)
         {
             var data = await filtered.Skip(skip)
                     .Take(take)
                     .ToListAsync();
 
-            return new Pagination<T>(pageSize, pageIndex, total, data);
+            return new Pagination<T>(pageSize, pageIndex, data, total);
         }
-        
+
         //la pagina existe
         if (total > pageSize * pageIndex)
         {
@@ -91,7 +114,7 @@ public class PersistenceEf: IPersistence
         //solo hay una pagina
         if (total < pageSize)
         {
-            return new Pagination<T>(pageSize, pageIndex, total, await filtered.ToListAsync());
+            return new Pagination<T>(pageSize, pageIndex, await filtered.ToListAsync(), total);
         }
 
         var targetPageIndex = pageIndex - 1;
@@ -105,7 +128,7 @@ public class PersistenceEf: IPersistence
 
             targetPageIndex--;
 
-            if (targetPageIndex < 0) return new Pagination<T>(pageSize, 0, 0, []);
+            if (targetPageIndex < 0) return new Pagination<T>(pageSize, 0, [], 0);
         }
     }
 

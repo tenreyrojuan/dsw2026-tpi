@@ -8,9 +8,9 @@ public sealed class Appointment : EntityBase
     public DateTime? CancelledAt{ get; private set; }
     public AppointmentState AppointmentState { get; private set; }
     public Guid PatientId { get; init; }
-    public Guid TimeSlotId { get; init; }
+    public Guid AvailabilitySlotId { get; init; }
     public Patient Patient { get; init; }
-    public TimeSlot TimeSlot { get; init; }
+    public AvailabilitySlot AvailabilitySlot { get; init; }
 
     #region Constructor for EF
 #pragma warning disable CS8618
@@ -20,10 +20,10 @@ public sealed class Appointment : EntityBase
 #pragma warning restore CS8618
     #endregion
     public Appointment (Patient patient,
-                TimeSlot timeSlot, string reason, Guid? id = null) : base(id)
+                AvailabilitySlot availabilitySlot, string reason, Guid? id = null) : base(id)
     {
         Patient = patient;
-        TimeSlot = timeSlot;
+        AvailabilitySlot = availabilitySlot;
         Reason = reason;
         AppointmentState = AppointmentState.BOOKED;
     }
@@ -32,7 +32,7 @@ public sealed class Appointment : EntityBase
     {
         AppointmentState = AppointmentState.CANCELLED;
         CancelledAt = DateTime.Now;
-        TimeSlot.Release();
+        AvailabilitySlot.Release();
         UpdateTimestamp();
     }
     

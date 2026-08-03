@@ -29,7 +29,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 });
 
             migrationBuilder.CreateTable(
-                name: "Specialities",
+                name: "Specialties",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -41,7 +41,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Specialities", x => x.Id);
+                    table.PrimaryKey("PK_Specialties", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -51,7 +51,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LicenseNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    SpecialityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SpecialtyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -61,15 +61,15 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 {
                     table.PrimaryKey("PK_Doctors", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Doctors_Specialities_SpecialityId",
-                        column: x => x.SpecialityId,
-                        principalTable: "Specialities",
+                        name: "FK_Doctors_Specialties_SpecialtyId",
+                        column: x => x.SpecialtyId,
+                        principalTable: "Specialties",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Availabilities",
+                name: "AvailabilityRules",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -85,9 +85,9 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Availabilities", x => x.Id);
+                    table.PrimaryKey("PK_AvailabilityRules", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Availabilities_Doctors_DoctorId",
+                        name: "FK_AvailabilityRules_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
                         principalColumn: "Id",
@@ -95,26 +95,26 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 });
 
             migrationBuilder.CreateTable(
-                name: "TimeSlots",
+                name: "AvailabilitySlots",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     StartingTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     EndingTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    TimeSlotState = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    AvailabilityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AvailabilitySlotState = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    AvailabilityRuleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Deleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TimeSlots", x => x.Id);
+                    table.PrimaryKey("PK_AvailabilitySlots", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TimeSlots_Availabilities_AvailabilityId",
-                        column: x => x.AvailabilityId,
-                        principalTable: "Availabilities",
+                        name: "FK_AvailabilitySlots_AvailabilityRules_AvailabilityRuleId",
+                        column: x => x.AvailabilityRuleId,
+                        principalTable: "AvailabilityRules",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -129,7 +129,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                     CancelledAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     AppointmentState = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     PatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TimeSlotId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AvailabilitySlotId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Deleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
@@ -138,18 +138,24 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 {
                     table.PrimaryKey("PK_Appointments", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Appointments_AvailabilitySlots_AvailabilitySlotId",
+                        column: x => x.AvailabilitySlotId,
+                        principalTable: "AvailabilitySlots",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Appointments_Patients_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Patients",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Appointments_TimeSlots_TimeSlotId",
-                        column: x => x.TimeSlotId,
-                        principalTable: "TimeSlots",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_AvailabilitySlotId",
+                table: "Appointments",
+                column: "AvailabilitySlotId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_PatientId",
@@ -157,16 +163,15 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Appointments_TimeSlotId",
-                table: "Appointments",
-                column: "TimeSlotId",
+                name: "IX_AvailabilityRules_DoctorId_Year_Month_WeekDay_StartingHour_EndingHour",
+                table: "AvailabilityRules",
+                columns: new[] { "DoctorId", "Year", "Month", "WeekDay", "StartingHour", "EndingHour" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Availabilities_DoctorId_Year_Month_WeekDay_StartingHour_EndingHour",
-                table: "Availabilities",
-                columns: new[] { "DoctorId", "Year", "Month", "WeekDay", "StartingHour", "EndingHour" },
-                unique: true);
+                name: "IX_AvailabilitySlots_AvailabilityRuleId",
+                table: "AvailabilitySlots",
+                column: "AvailabilityRuleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Doctors_LicenseNumber",
@@ -175,9 +180,9 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Doctors_SpecialityId",
+                name: "IX_Doctors_SpecialtyId",
                 table: "Doctors",
-                column: "SpecialityId");
+                column: "SpecialtyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Patients_Dni",
@@ -192,15 +197,10 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Specialities_Name",
-                table: "Specialities",
+                name: "IX_Specialties_Name",
+                table: "Specialties",
                 column: "Name",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TimeSlots_AvailabilityId",
-                table: "TimeSlots",
-                column: "AvailabilityId");
         }
 
         /// <inheritdoc />
@@ -210,19 +210,19 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 name: "Appointments");
 
             migrationBuilder.DropTable(
+                name: "AvailabilitySlots");
+
+            migrationBuilder.DropTable(
                 name: "Patients");
 
             migrationBuilder.DropTable(
-                name: "TimeSlots");
-
-            migrationBuilder.DropTable(
-                name: "Availabilities");
+                name: "AvailabilityRules");
 
             migrationBuilder.DropTable(
                 name: "Doctors");
 
             migrationBuilder.DropTable(
-                name: "Specialities");
+                name: "Specialties");
         }
     }
 }
