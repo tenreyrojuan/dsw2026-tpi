@@ -26,11 +26,11 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
                .HasForeignKey(a => a.PatientId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(a => a.TimeSlot)
+        builder.HasOne(a => a.AvailabilitySlot)
                .WithOne(t => t.Appointment)
-               .HasForeignKey<Appointment>(a => a.TimeSlotId)
+               .HasForeignKey<Appointment>(a => a.AvailabilitySlotId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(a => a.TimeSlotId).IsUnique();
+        builder.HasIndex(a => a.AvailabilitySlotId).IsUnique();
     }
 }

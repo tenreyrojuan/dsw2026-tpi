@@ -1,6 +1,6 @@
 ﻿namespace Dsw2026Tpi.Domain.Entities;
 //Estado de Turno
-public enum TimeSlotState
+public enum AvailabilitySlotState
 {
     AVAILABLE = 1,
     BOOKED,

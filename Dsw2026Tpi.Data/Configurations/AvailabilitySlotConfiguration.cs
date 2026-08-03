@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Dsw2026Tpi.Data.Configurations;
 
-public class TimeSlotConfiguration : IEntityTypeConfiguration<TimeSlot>
+public class AvailabilitySlotConfiguration : IEntityTypeConfiguration<AvailabilitySlot>
 {
-    public void Configure(EntityTypeBuilder<TimeSlot> builder)
+    public void Configure(EntityTypeBuilder<AvailabilitySlot> builder)
     {
-        builder.ToTable("TimeSlots");
+        builder.ToTable("AvailabilitySlots");
 
         builder.HasKey(t => t.Id);
 
@@ -20,13 +20,13 @@ public class TimeSlotConfiguration : IEntityTypeConfiguration<TimeSlot>
         builder.Property(t => t.StartingTime).IsRequired();
         builder.Property(t => t.EndingTime).IsRequired();
 
-        builder.Property(t => t.TimeSlotState)
+        builder.Property(t => t.AvailabilitySlotState)
                .HasConversion<string>()
                .HasMaxLength(20)
                .IsRequired();
 
-        builder.HasOne(t => t.Availability)
-               .WithMany(a => a.TimeSlots)
+        builder.HasOne(t => t.AvailabilityRule)
+               .WithMany(a => a.AvailabilitySlots)
                .OnDelete(DeleteBehavior.Cascade);
     }
 }
