@@ -31,8 +31,8 @@ public class SpecialtyController : AppController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddSpecialty([FromBody] SpecialtyModel.Request request)
     {
-        await _service.AddSpecialty(request.Name, request.Description);
-        return Ok();
+        var result = await _service.AddSpecialty(request.Name, request.Description);
+        return Ok(result);
     }
 
     [HttpPut("{id}")]
@@ -41,8 +41,8 @@ public class SpecialtyController : AppController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateSpecialty([FromRoute] Guid id, [FromBody] SpecialtyModel.Request request)
     {
-        await _service.UpdateSpecialty(id, request.Name, request.Description);
-        return Ok();
+        var result = await _service.UpdateSpecialty(id, request.Name, request.Description);
+        return Ok(result);
     }
 
     [HttpDelete("{id}")]
