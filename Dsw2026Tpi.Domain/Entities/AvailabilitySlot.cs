@@ -8,7 +8,7 @@ public sealed class AvailabilitySlot : EntityBase
 
     public AvailabilitySlotState AvailabilitySlotState { get; private set; }
 
-    public Guid AvailabilityId { get; private set; }
+    public Guid AvailabilityRuleId { get; private set; }
 
     public AvailabilityRule AvailabilityRule { get; private set; }
 
