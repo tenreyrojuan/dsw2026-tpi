@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Dsw2026Tpi.Data.Migrations
+namespace Dsw2026Tpi.Data.Migrations.Domain
 {
     [DbContext(typeof(Dsw2026TpiDbContext))]
-    [Migration("20260803050455_InitialDomain")]
+    [Migration("20260803071210_InitialDomain")]
     partial class InitialDomain
     {
         /// <inheritdoc />
