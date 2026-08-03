@@ -25,4 +25,12 @@ public class AdvancedSearchesController : AppController
         var result = await _service.GetAllDailyAppointments(date);
         return Ok(result);
     }
+
+    [HttpGet("search")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> Search([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] Guid? specialtyId = null, [FromQuery] Guid? doctorId = null, [FromQuery] int? dni = null, [FromQuery] DateOnly? date = null)
+    {
+        var result = await _service.SearchAppointments(pageSize, pageIndex, specialtyId, doctorId, dni, date);
+        return Ok(result);
+    }
 }
