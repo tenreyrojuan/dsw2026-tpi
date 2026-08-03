@@ -5,6 +5,7 @@ using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 using System.Numerics;
+using Dsw2026Tpi.Data.Extensions;
 
 namespace Dsw2026Tpi.Application.Services;
 
@@ -68,6 +69,8 @@ public class AvailabilityService : IAvailabilityService
         int currentMonth, int currentYear,
         DateTime now)
     {
+        var holidays = HolidaySeed.LoadHolidays();
+
         ICollection<AvailabilityRule> createdAvailabilities = [];
         foreach (var day in days)
         {
@@ -89,7 +92,7 @@ public class AvailabilityService : IAvailabilityService
 
             var availabilityRule = new AvailabilityRule(currentMonth, currentYear, weekDay, day.StartTime, day.EndTime, doctor);
 
-            availabilityRule.GenerateMonthlyAvailabilitySlots(now.Day);
+            availabilityRule.GenerateMonthlyAvailabilitySlots(now.Day, holidays);
 
             createdAvailabilities.Add(availabilityRule);
         }

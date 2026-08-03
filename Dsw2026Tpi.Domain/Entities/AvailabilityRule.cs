@@ -45,7 +45,7 @@ public sealed class AvailabilityRule : EntityBase
         return requestedStart < EndingHour && StartingHour < requestedEnd;
     }
 
-    public void GenerateMonthlyAvailabilitySlots(int startingDay)
+    public void GenerateMonthlyAvailabilitySlots(int startingDay, IEnumerable<DateOnly> holidays)
     {
         var date = new DateOnly(Year, Month, startingDay);
         //busca el primer dia del mes que coincida con el dia de semana presente en el array del request
@@ -57,7 +57,10 @@ public sealed class AvailabilityRule : EntityBase
         //crea los turnos diarios para el dia solicitado, saltando de a 7 dias hasta que termina el mes.
         while (date.Month == Month)
         {
-            CreateDailyAvailabilitySlots(date);
+            if (!holidays.Contains(date))
+            {
+                CreateDailyAvailabilitySlots(date);
+            }
             date = date.AddDays(7);
         }
     }
