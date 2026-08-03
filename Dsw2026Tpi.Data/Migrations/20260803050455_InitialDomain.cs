@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Dsw2026Tpi.Data.Migrations.Domain
+namespace Dsw2026Tpi.Data.Migrations
 {
     /// <inheritdoc />
     public partial class InitialDomain : Migration
@@ -69,7 +69,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 });
 
             migrationBuilder.CreateTable(
-                name: "Availabilities",
+                name: "AvailabilityRules",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -85,9 +85,9 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Availabilities", x => x.Id);
+                    table.PrimaryKey("PK_AvailabilityRules", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Availabilities_Doctors_DoctorId",
+                        name: "FK_AvailabilityRules_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
                         principalColumn: "Id",
@@ -103,7 +103,6 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                     StartingTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     EndingTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     AvailabilitySlotState = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    AvailabilityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AvailabilityRuleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -113,9 +112,9 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 {
                     table.PrimaryKey("PK_AvailabilitySlots", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AvailabilitySlots_Availabilities_AvailabilityRuleId",
+                        name: "FK_AvailabilitySlots_AvailabilityRules_AvailabilityRuleId",
                         column: x => x.AvailabilityRuleId,
-                        principalTable: "Availabilities",
+                        principalTable: "AvailabilityRules",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -164,8 +163,8 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Availabilities_DoctorId_Year_Month_WeekDay_StartingHour_EndingHour",
-                table: "Availabilities",
+                name: "IX_AvailabilityRules_DoctorId_Year_Month_WeekDay_StartingHour_EndingHour",
+                table: "AvailabilityRules",
                 columns: new[] { "DoctorId", "Year", "Month", "WeekDay", "StartingHour", "EndingHour" },
                 unique: true);
 
@@ -217,7 +216,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                 name: "Patients");
 
             migrationBuilder.DropTable(
-                name: "Availabilities");
+                name: "AvailabilityRules");
 
             migrationBuilder.DropTable(
                 name: "Doctors");

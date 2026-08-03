@@ -8,7 +8,7 @@ public class AvailabilityRuleConfiguration : IEntityTypeConfiguration<Availabili
 {
     public void Configure(EntityTypeBuilder<AvailabilityRule> builder)
     {
-        builder.ToTable("Availabilities");
+        builder.ToTable("AvailabilityRules");
         builder.HasKey(a => a.Id);
 
         builder.Property(a => a.Deleted).HasDefaultValue(false);
@@ -21,7 +21,7 @@ public class AvailabilityRuleConfiguration : IEntityTypeConfiguration<Availabili
         builder.Property(a => a.EndingHour).IsRequired();
 
         builder.HasOne(a => a.Doctor)
-               .WithMany(d => d.Availabilities)
+               .WithMany(d => d.AvailabilityRules)
                .HasForeignKey(a => a.DoctorId)
                .OnDelete(DeleteBehavior.Cascade);
 
