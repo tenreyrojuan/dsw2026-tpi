@@ -16,10 +16,10 @@ public class AdvancedSearchesController : AppController
     {
         _service = service;
     }
+    
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-
     public async Task<IActionResult> GetAllDailyAppointments([FromQuery] DateOnly date)
     {
         var result = await _service.GetAllDailyAppointments(date);

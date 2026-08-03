@@ -2,9 +2,6 @@
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Dsw2026Tpi.Application.Services;
 
@@ -19,10 +16,10 @@ public class AdvancedSearchesService : IAdvancedSearchesService
     public async Task<IEnumerable<AppointmentModel.Response>> GetAllDailyAppointments(DateOnly date)
     {
         var todaysAppointments
-            = await _persistence.GetFiltered<Appointment>(a => a.TimeSlot.Date == date, nameof(Patient), nameof(TimeSlot));
+            = await _persistence.GetFiltered<Appointment>(a => a.AvailabilitySlot.Date == date, nameof(Patient), nameof(AvailabilitySlot));
 
         return todaysAppointments is null ? [] :
             todaysAppointments.Select(
-                a => new AppointmentModel.Response(a.Patient.FullName, a.TimeSlot.Date, a.TimeSlot.StartingTime));
+                a => new AppointmentModel.Response(a.Patient.FullName, a.AvailabilitySlot.Date, a.AvailabilitySlot.StartingTime));
     }
 }
