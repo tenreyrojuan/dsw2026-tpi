@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
-[Route("api/appointment")]
+[Route("api/appointments")]
 [Authorize(Policies.AdminPolicy)]
 [EnableRateLimiting(Policies.AdminPolicy)]
 public class AdvancedSearchesController : AppController
@@ -28,7 +28,7 @@ public class AdvancedSearchesController : AppController
 
     [HttpGet("search")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Search([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] Guid? specialtyId = null, [FromQuery] Guid? doctorId = null, [FromQuery] int? dni = null, [FromQuery] DateOnly? date = null)
+    public async Task<IActionResult> Search([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] Guid specialtyId, [FromQuery] Guid doctorId, [FromQuery] int dni, [FromQuery] DateOnly date)
     {
         var result = await _service.SearchAppointments(pageSize, pageIndex, specialtyId, doctorId, dni, date);
         return Ok(result);
