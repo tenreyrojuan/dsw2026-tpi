@@ -39,8 +39,6 @@ public class Program
 
             app.UseRateLimiter();
 
-            app.UseRouting();
-
             app.UseCors();
 
             app.UseSerilogRequestLogging();
