@@ -132,31 +132,31 @@
   <data name="DNI_NOTFOUND" xml:space="preserve">
     <value>El DNI no corresponde a un paciente registrado.</value>
   </data>
-  <data name="NOTACTUAL_SLOT" xml:space="preserve">
+  <data name="INVALID_SLOT" xml:space="preserve">
     <value>El Turno debe corresponder a fechas posteriores a la actual.</value>
   </data>
   <data name="NOTAVAILABLE_SLOT" xml:space="preserve">
     <value>El Turno debe estar disponible.</value>
   </data>
-  <data name="NOT_BOOKEDSLOT" xml:space="preserve">
+  <data name="UNBOOKED_SLOT" xml:space="preserve">
     <value>El Turno no corresponde  a uno ocupado.</value>
   </data>
   <data name="INVALID_DAY" xml:space="preserve">
-    <value>El Día no existe.</value>
+    <value>El Día no es invalido.</value>
   </data>
-  <data name="DAY_ERROR" xml:space="preserve">
-    <value>StartTime debe ser antes que endTime</value>
+  <data name="INVALID_TIME_ERROR" xml:space="preserve">
+    <value>El tiempo de comienzo debe ser previo al tiempo de finalizacion</value>
   </data>
   <data name="OVERLAP" xml:space="preserve">
     <value>Los horarios no deben coincidir con los ya cargados.</value>
   </data>
   <data name="INVALID_DESCRIPTION" xml:space="preserve">
-    <value>La Descripción es inválida. El campo debe contener entre 10 y 100 números.</value>
+    <value>La Descripción es inválida. El campo debe contener entre 10 y 100 caracteres.</value>
   </data>
   <data name="INVALID_EMAIL" xml:space="preserve">
     <value>El formato del Email no es correcto.</value>
   </data>
-  <data name="EMAIL_ERROR" xml:space="preserve">
+  <data name="EMAIL_NOTFOUND" xml:space="preserve">
     <value>El Email no se encontró.</value>
   </data>
   <data name="PASSWORD_ERROR" xml:space="preserve">
@@ -167,5 +167,14 @@
   </data>
   <data name="DUPLICATE_LICENCE" xml:space="preserve">
     <value>Ya existe un medico con la licencia ingresada. Ingrese una distinta.</value>
+  </data>
+  <data name="INVALID_DNI_APPOINTMENT" xml:space="preserve">
+    <value>El DNI es inválido. El campo debe contener entre 7 y 10 números.</value>
+  </data>
+  <data name="DUPLICATE_EMAIL" xml:space="preserve">
+    <value>El email ingresado ya se encuentra registrado.</value>
+  </data>
+  <data name="DUPLICATE_SPECIALTY" xml:space="preserve">
+    <value>Ya existe una especialidad con ese nombre.</value>
   </data>
 </root>

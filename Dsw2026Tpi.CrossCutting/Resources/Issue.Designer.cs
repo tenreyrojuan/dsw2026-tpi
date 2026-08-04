@@ -61,15 +61,6 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a StartTime debe ser antes que endTime.
-        /// </summary>
-        public static string DAY_ERROR {
-            get {
-                return ResourceManager.GetString("DAY_ERROR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Busca una cadena traducida similar a El DNI no corresponde a un paciente registrado..
         /// </summary>
         public static string DNI_NOTFOUND {
@@ -88,6 +79,15 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a El email ingresado ya se encuentra registrado..
+        /// </summary>
+        public static string DUPLICATE_EMAIL {
+            get {
+                return ResourceManager.GetString("DUPLICATE_EMAIL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Ya existe un medico con la licencia ingresada. Ingrese una distinta..
         /// </summary>
         public static string DUPLICATE_LICENCE {
@@ -97,11 +97,20 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Ya existe una especialidad con ese nombre..
+        /// </summary>
+        public static string DUPLICATE_SPECIALTY {
+            get {
+                return ResourceManager.GetString("DUPLICATE_SPECIALTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El Email no se encontró..
         /// </summary>
-        public static string EMAIL_ERROR {
+        public static string EMAIL_NOTFOUND {
             get {
-                return ResourceManager.GetString("EMAIL_ERROR", resourceCulture);
+                return ResourceManager.GetString("EMAIL_NOTFOUND", resourceCulture);
             }
         }
         
@@ -115,7 +124,7 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a El Día no existe..
+        ///   Busca una cadena traducida similar a El Día no es invalido..
         /// </summary>
         public static string INVALID_DAY {
             get {
@@ -124,7 +133,7 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a La Descripción es inválida. El campo debe contener entre 10 y 100 números..
+        ///   Busca una cadena traducida similar a La Descripción es inválida. El campo debe contener entre 10 y 100 caracteres..
         /// </summary>
         public static string INVALID_DESCRIPTION {
             get {
@@ -138,6 +147,15 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         public static string INVALID_DNI {
             get {
                 return ResourceManager.GetString("INVALID_DNI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El DNI es inválido. El campo debe contener entre 7 y 10 números..
+        /// </summary>
+        public static string INVALID_DNI_APPOINTMENT {
+            get {
+                return ResourceManager.GetString("INVALID_DNI_APPOINTMENT", resourceCulture);
             }
         }
         
@@ -169,20 +187,20 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a El Turno no corresponde  a uno ocupado..
+        ///   Busca una cadena traducida similar a El Turno debe corresponder a fechas posteriores a la actual..
         /// </summary>
-        public static string NOT_BOOKEDSLOT {
+        public static string INVALID_SLOT {
             get {
-                return ResourceManager.GetString("NOT_BOOKEDSLOT", resourceCulture);
+                return ResourceManager.GetString("INVALID_SLOT", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a El Turno debe corresponder a fechas posteriores a la actual..
+        ///   Busca una cadena traducida similar a El tiempo de comienzo debe ser previo al tiempo de finalizacion.
         /// </summary>
-        public static string NOTACTUAL_SLOT {
+        public static string INVALID_TIME_ERROR {
             get {
-                return ResourceManager.GetString("NOTACTUAL_SLOT", resourceCulture);
+                return ResourceManager.GetString("INVALID_TIME_ERROR", resourceCulture);
             }
         }
         
@@ -210,6 +228,15 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         public static string PASSWORD_ERROR {
             get {
                 return ResourceManager.GetString("PASSWORD_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El Turno no corresponde  a uno ocupado..
+        /// </summary>
+        public static string UNBOOKED_SLOT {
+            get {
+                return ResourceManager.GetString("UNBOOKED_SLOT", resourceCulture);
             }
         }
     }

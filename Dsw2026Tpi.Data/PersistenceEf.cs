@@ -74,7 +74,7 @@ public class PersistenceEf : IPersistence
     }
     public async Task<IEnumerable<T>> RemoveRange<T>(IEnumerable<T> entities) where T : EntityBase
     {
-        _context.RemoveRange(entities); // no existe RemoveRangeAsync????
+        _context.RemoveRange(entities);
         await _context.SaveChangesAsync();
         return entities;
     }
