@@ -46,6 +46,7 @@ public class DoctorService : IDoctorService
             availabilities
             .OrderBy(a => a.WeekDay)
             .Select(a => new DoctorAvailabilityModel.Response(
+                doctor.Id,
                 CultureInfo.GetCultureInfo("es-ES").DateTimeFormat.GetDayName(a.WeekDay).ToUpper(),
                 a.StartingHour.ToString("HH:mm"),
                 a.EndingHour.ToString("HH:mm")

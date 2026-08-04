@@ -11,5 +11,6 @@ public record DoctorModel
 }
 public record DoctorAvailabilityModel
 {
-    public record Response(string Day, string StartTime, string EndTime);
+    // Aqui deberia devolver id y un array con varios dias, no un array donde siempre esta el id (como dice el endpoint
+    public record Response(Guid Id,string Day, string StartTime, string EndTime);
 }

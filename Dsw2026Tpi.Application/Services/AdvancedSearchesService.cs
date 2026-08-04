@@ -48,8 +48,8 @@ public class AdvancedSearchesService : IAdvancedSearchesService
             = a => a.AvailabilitySlot.Date;
 
         string[] includes = {
-            "AvailabilitySlot.AvailabilityRule.Doctor.Specialty",
-            "Patient"
+            $"{nameof(AvailabilitySlot)}.{nameof(AvailabilityRule)}.{nameof(Doctor)}.{nameof(Specialty)}",
+            $"{nameof(Patient)}"
         };
         var appointments = await _persistence.Paginate<Appointment, DateOnly>(pageSize, pageIndex, predicate, sortOrder, includes);
 

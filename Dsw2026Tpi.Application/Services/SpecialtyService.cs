@@ -30,9 +30,15 @@ public class SpecialtyService : ISpecialtyService
         if (!name.IsNameValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
                 .WithDetail(nameof(name),Issue.INVALID_NAME);
+
         if (!description.IsDescriptionValid())
             throw new ValidationException(ErrorCodes.VALIDATION_ERROR, nameof(ErrorCodes.VALIDATION_ERROR))
                 .WithDetail(nameof(description), Issue.INVALID_DESCRIPTION);
+
+        var specialtyExist = await _persistence.Any<Specialty>(s => s.Name.Equals(name));
+        if (specialtyExist)
+            throw new ConflictException()
+                .WithDetail(nameof(name), Issue.DUPLICATE_SPECIALTY);
         
         var specialty = new Specialty(name, description);
         var created = await _persistence.Add<Specialty>(specialty);

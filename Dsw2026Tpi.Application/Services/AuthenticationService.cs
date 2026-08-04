@@ -8,7 +8,6 @@ using Dsw2026Tpi.Data.Identity;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Data;
 
@@ -39,14 +38,18 @@ public class AuthenticationService : IAuthenticationService
     }
     public async Task<LoginAdminModel.Response> LoginAdmin(LoginAdminModel.Request request)
     {
-        if (!request.Email.IsEmailValid()) 
+        if (!request.Email.IsEmailValid())
             throw new AuthenticationException()
                 .WithDetail(nameof(request.Email), Issue.INVALID_EMAIL);
 
-        var user = await _userManager.FindByEmailAsync(request.Email) 
+        var user = await _userManager.FindByEmailAsync(request.Email)
             ?? throw new AuthenticationException()
-                .WithDetail(nameof(request.Email), Issue.EMAIL_ERROR);
-
+                .WithDetail(nameof(request.Email), Issue.EMAIL_NOTFOUND);
+        /*
+        if (await _userManager.IsInRoleAsync(user, Roles.Administrator))
+            throw new AuthenticationException()
+                .WithDetail(nameof(request.Email), Issue.DUPLICATE_EMAIL);
+        */
         var result = await _signInManager.CheckPassword(user, request.Password);
 
         if (!result)
@@ -58,7 +61,7 @@ public class AuthenticationService : IAuthenticationService
 
         var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
-        var token  = _jwtService.GenerateToken(user.UserName!, role);
+        var token = _jwtService.GenerateToken(user.UserName!, role);
 
         return new LoginAdminModel.Response(
             token,
@@ -85,9 +88,14 @@ public class AuthenticationService : IAuthenticationService
         // Usuario Existe
         if (user != null)
         {
-
+            /*
+            if (await _userManager.IsInRoleAsync(user, Roles.Patient))
+                throw new AuthenticationException()
+                    .WithDetail(nameof(request.Email), Issue.DUPLICATE_EMAIL);
+            */
             var patient = await _persistence.First<Patient>(p => p.UserId == Guid.Parse(user.Id))
-                ?? throw new Exception();
+                    ?? throw new AuthenticationException()
+                    .WithDetail(nameof(request.Dni), Issue.DNI_NOTFOUND);
 
             if (patient.Dni != dni)
             {
@@ -101,18 +109,12 @@ public class AuthenticationService : IAuthenticationService
             );
         }
         // Usuario Nuevo
-        var userExist = await _persistence.First<Patient>(p => p.Dni == dni);
-        if (userExist != null)
+        var userExists = await _persistence.Any<Patient>(p => p.Dni == dni);
+        if (userExists)
             throw new ConflictException()
                 .WithDetail(nameof(dni), Issue.DUPLICATE_DNI);
 
-        user = new ApplicationUser
-        {
-            UserName = request.Email,
-            Email = request.Email,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
+        user = new ApplicationUser(request.Email, request.Email);
 
         var result = await _userManager.CreateAsync(user);
         if (!result.Succeeded)
@@ -131,27 +133,23 @@ public class AuthenticationService : IAuthenticationService
 
         _ = await _userManager.AddToRoleAsync(user, Roles.Patient);
 
+        _logger.LogInformation("Paciente registrado: {Dni}", dni);
+
         var tokenNew = _jwtService.GenerateToken(user.UserName!, role);
         return new LoginPatientModel.Response(tokenNew, role);
     }
 
     public async Task<RegisterModel.Response> Register(RegisterModel.Request request)
     {
-        if (!request.Email.IsEmailValid()) 
+        if (!request.Email.IsEmailValid())
             throw new ValidationException()
                 .WithDetail(nameof(request.Email), Issue.INVALID_EMAIL);
 
-        var user = new ApplicationUser
-        {
-            UserName = request.Email,
-            Email = request.Email,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
+        var user = new ApplicationUser(request.Email, request.Email);
 
         var result = await _userManager.CreateAsync(user, request.Password);
 
-        if (!result.Succeeded) 
+        if (!result.Succeeded)
             throw new ConflictException()
                 .WithDetail(result.Errors.Select(e => (e.Code, e.Description)));
 

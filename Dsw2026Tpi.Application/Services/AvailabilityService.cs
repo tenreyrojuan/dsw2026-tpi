@@ -49,7 +49,8 @@ public class AvailabilityService : IAvailabilityService
 
         // se listan las disponibilidades que son de este mes, este año y ademas no tienen slots ocupados
         var availabilitiesToDelete = doctor.AvailabilityRules
-           .Where(a => a.Month == currentMonth && a.Year == currentYear && !a.AvailabilitySlots.Any(s => s.AvailabilitySlotState == AvailabilitySlotState.BOOKED))
+           .Where(a => a.Month == currentMonth && a.Year == currentYear && 
+                 !a.AvailabilitySlots.Any(s => s.AvailabilitySlotState == AvailabilitySlotState.BOOKED))
            .ToArray();
         _ = await _persistence.RemoveRange<AvailabilityRule>(availabilitiesToDelete);
 
@@ -76,7 +77,7 @@ public class AvailabilityService : IAvailabilityService
         {
             if (day.StartTime >= day.EndTime)
                 throw new BusinessRuleException()
-                    .WithDetail(nameof(day), Issue.DAY_ERROR);
+                    .WithDetail(nameof(day), Issue.INVALID_TIME_ERROR);
 
             DayOfWeek weekDay = ParseDayOfWeek(day.Day);
 
