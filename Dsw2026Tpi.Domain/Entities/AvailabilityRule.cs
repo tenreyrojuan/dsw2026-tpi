@@ -32,7 +32,7 @@ public sealed class AvailabilityRule : EntityBase
         Doctor = doctor;
     }
 
-    public void UpdateAvailability(DayOfWeek weekDay, TimeOnly startingHour, TimeOnly endingHour, Guid doctorId)
+    public void UpdateAvailability(DayOfWeek weekDay, TimeOnly startingHour, TimeOnly endingHour)
     {
         WeekDay = weekDay;
         StartingHour = startingHour;
