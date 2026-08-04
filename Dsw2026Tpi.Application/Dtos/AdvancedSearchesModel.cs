@@ -3,7 +3,7 @@
 public record AdvancedSearchesModel
 {
     public record AppointmentSearchResponse(Guid AppointmentsId, string AppointmentsStatus, PatientDto Patient, DoctorDto Doctor);
-    public record PatientDto(string Dni, string FullName);
+    public record PatientDto(long Dni, string FullName);
     public record DoctorDto(Guid DoctorId, string Name, SpecialtyDto Specialty);
     public record SpecialtyDto(Guid SpecialtyId, string Name);
 }

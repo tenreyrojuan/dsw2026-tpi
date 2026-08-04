@@ -8,7 +8,6 @@ namespace Dsw2026Tpi.Api.Controllers;
 
 [Route("api/appointments")]
 [Authorize(Policies.AdminPolicy)]
-[EnableRateLimiting(Policies.AdminPolicy)]
 public class AdvancedSearchesController : AppController
 {
     private readonly IAdvancedSearchesService _service;
@@ -28,7 +27,7 @@ public class AdvancedSearchesController : AppController
 
     [HttpGet("search")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchAppointments([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] Guid specialtyId, [FromQuery] Guid doctorId, [FromQuery] int dni, [FromQuery] DateOnly date)
+    public async Task<IActionResult> SearchAppointments([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] Guid specialtyId, [FromQuery] Guid doctorId, [FromQuery] long dni, [FromQuery] DateOnly date)
     {
         var result = await _service.SearchAppointments(pageSize, pageIndex, specialtyId, doctorId, dni, date);
         return Ok(result);

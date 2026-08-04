@@ -65,7 +65,7 @@ public class AuthenticationService : IAuthenticationService
 
         return new LoginAdminModel.Response(
             token,
-            role
+            role!.ToUpper()
         );
     }
 
@@ -136,7 +136,7 @@ public class AuthenticationService : IAuthenticationService
         _logger.LogInformation("Paciente registrado: {Dni}", dni);
 
         var tokenNew = _jwtService.GenerateToken(user.UserName!, role);
-        return new LoginPatientModel.Response(tokenNew, role);
+        return new LoginPatientModel.Response(tokenNew, role.ToUpper());
     }
 
     public async Task<RegisterModel.Response> Register(RegisterModel.Request request)

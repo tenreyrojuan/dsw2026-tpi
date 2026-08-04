@@ -1,13 +1,10 @@
 ﻿using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.CrossCutting.Identity;
 using Dsw2026Tpi.Data.Identity;
-using Dsw2026Tpi.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
-using System.Globalization;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -136,19 +133,30 @@ public static class SecurityConfigurationExtensions
                         opt.QueueLimit = 0;
                         opt.Window = TimeSpan.FromMinutes(1);
                     });
-            options.AddFixedWindowLimiter(Policies.AppointmentRequestsPolicy, opt =>
+            options.AddPolicy(Policies.AppointmentRequestsPolicy, httpContext =>
             {
-                opt.AutoReplenishment = true;
-                opt.PermitLimit = 5;
-                opt.QueueLimit = 0;
-                opt.Window = TimeSpan.FromMinutes(1);
+                // se busca el nombre del paciente ya autenticado
+                string userId = httpContext.User.Identity?.Name!;
+
+                var limiter = RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: userId,
+                factory: _ => new FixedWindowRateLimiterOptions
+                {
+                    AutoReplenishment = true,
+                    PermitLimit = 5,
+                    QueueLimit = 0,
+                    Window = TimeSpan.FromMinutes(1)
+                });
+                return limiter;
             });
             options.OnRejected = async (context, cancellationToken) =>
             {
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                logger.LogError("Se enviaron demasiadas peticiones. Intentelo nuevamente mas adelante.");
                 throw new TooManyRequestsException();
             };
         });
         return services;
     }
-    
+
 }

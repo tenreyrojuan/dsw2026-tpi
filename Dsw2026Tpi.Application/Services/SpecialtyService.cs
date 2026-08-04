@@ -19,8 +19,8 @@ public class SpecialtyService : ISpecialtyService
     public async Task<Pagination<SpecialtyModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
         var specialties = await _persistence.Paginate<Specialty, string>(pageSize, pageIndex,
-                                                   e => e.Deleted == false && (string.IsNullOrWhiteSpace(name) ||
-                                                   e.Name.Contains(name)), x => x.Name);
+                                                   e => string.IsNullOrWhiteSpace(name) ||
+                                                   e.Name.Contains(name), x => x.Name);
 
         return specialties.Map(e => new SpecialtyModel.Response(e.Id, e.Name, e.Description));
     }

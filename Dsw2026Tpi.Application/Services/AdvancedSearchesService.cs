@@ -26,7 +26,7 @@ public class AdvancedSearchesService : IAdvancedSearchesService
                 a => new AppointmentModel.Response(a.Patient.FullName, a.AvailabilitySlot.Date, a.AvailabilitySlot.StartingTime));
     }
 
-    public async Task<Pagination<AdvancedSearchesModel.AppointmentSearchResponse>> SearchAppointments(int pageSize, int pageIndex, Guid specialtyId, Guid doctorId, int dni, DateOnly date)
+    public async Task<Pagination<AdvancedSearchesModel.AppointmentSearchResponse>> SearchAppointments(int pageSize, int pageIndex, Guid specialtyId, Guid doctorId, long dni, DateOnly date)
     {
 
         var doctor = await _persistence.GetById<Doctor>(doctorId)
@@ -56,7 +56,7 @@ public class AdvancedSearchesService : IAdvancedSearchesService
         return appointments.Map(a => new AdvancedSearchesModel.AppointmentSearchResponse(
             a.Id,
             a.AppointmentState.ToString(),
-            new AdvancedSearchesModel.PatientDto(a.Patient.Dni, a.Patient.FullName),
+            new AdvancedSearchesModel.PatientDto(dni, a.Patient.FullName),
                 new AdvancedSearchesModel.DoctorDto(
                     a.AvailabilitySlot.AvailabilityRule.DoctorId,
                     a.AvailabilitySlot.AvailabilityRule.Doctor.Name,

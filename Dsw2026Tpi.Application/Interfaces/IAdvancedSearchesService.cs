@@ -9,5 +9,5 @@ namespace Dsw2026Tpi.Application.Interfaces;
 public interface IAdvancedSearchesService
 {
     Task<IEnumerable<AppointmentModel.Response>> GetAllDailyAppointments(DateOnly date);
-    Task<Pagination<AdvancedSearchesModel.AppointmentSearchResponse>> SearchAppointments(int pageSize, int pageIndex, Guid specialtyId , Guid doctorId, int dni, DateOnly date);
+    Task<Pagination<AdvancedSearchesModel.AppointmentSearchResponse>> SearchAppointments(int pageSize, int pageIndex, Guid specialtyId , Guid doctorId, long dni, DateOnly date);
 }

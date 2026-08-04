@@ -2,10 +2,9 @@
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.CrossCutting.Resources;
+using Dsw2026Tpi.Data.Extensions;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
-using System.Numerics;
-using Dsw2026Tpi.Data.Extensions;
 
 namespace Dsw2026Tpi.Application.Services;
 
@@ -27,13 +26,13 @@ public class AvailabilityService : IAvailabilityService
         var currentMonth = now.Month;
         var currentYear = now.Year;
 
-        ICollection<AvailabilityRule> finalAvailabilities 
-            = CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear,now);
-        
+        ICollection<AvailabilityRule> finalAvailabilities
+            = CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear, now);
+
         var disps = await _persistence.AddRange(finalAvailabilities);
 
         return new AvailabilityModel.Response(doctor.Id,
-            disps.Select(a => 
+            disps.Select(a =>
             new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));
     }
 
@@ -49,18 +48,18 @@ public class AvailabilityService : IAvailabilityService
 
         // se listan las disponibilidades que son de este mes, este año y ademas no tienen slots ocupados
         var availabilitiesToDelete = doctor.AvailabilityRules
-           .Where(a => a.Month == currentMonth && a.Year == currentYear && 
+           .Where(a => a.Month == currentMonth && a.Year == currentYear &&
                  !a.AvailabilitySlots.Any(s => s.AvailabilitySlotState == AvailabilitySlotState.BOOKED))
            .ToArray();
         _ = await _persistence.RemoveRange<AvailabilityRule>(availabilitiesToDelete);
 
-        ICollection<AvailabilityRule> finalAvailabilities = 
-            CreateFinalAvailabilities(request.Days,doctor,currentMonth,currentYear,now);
+        ICollection<AvailabilityRule> finalAvailabilities =
+            CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear, now);
 
         var disps = await _persistence.AddRange(finalAvailabilities);
 
         return new AvailabilityModel.Response(doctor.Id,
-            finalAvailabilities.Select(a => 
+            finalAvailabilities.Select(a =>
             new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));
 
     }
