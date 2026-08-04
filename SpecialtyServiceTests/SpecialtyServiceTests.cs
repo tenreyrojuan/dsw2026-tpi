@@ -41,7 +41,7 @@ public class SpecialtyServiceTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(2, result.Data.Count());
+        Assert.Equal(specialtiesList.Count, result.Data.Count());
         Assert.Equal(pageSize, result.PageSize);
         Assert.Equal(pageIndex, result.PageIndex);
         Assert.IsType<SpecialtyModel.Response>(result.Data.First());
