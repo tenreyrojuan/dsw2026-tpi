@@ -1,7 +1,6 @@
 ﻿using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Identity;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -18,12 +17,12 @@ public class AuthenticationController : AppController
     }
 
     [HttpPost("admin/register")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterModel.Request request)
     {
         var result = await _authenticationService.Register(request);
-        return Ok(result.Email);
+        return CreatedAtAction(nameof(Register), result.Email);
     }
 
     [HttpPost("admin/login")]

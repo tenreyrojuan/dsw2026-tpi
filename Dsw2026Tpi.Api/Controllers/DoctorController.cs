@@ -39,13 +39,13 @@ public class DoctorController : AppController
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddDoctor([FromBody] DoctorModel.Request request) 
     {
         var result = await _service.AddDoctor(request);
-        return Ok(result);
+        return CreatedAtAction(nameof(AddDoctor),result);
     }
 
     [HttpPut("{id:Guid}")]

@@ -26,16 +26,16 @@ public class SpecialtyController : AppController
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddSpecialty([FromBody] SpecialtyModel.Request request)
     {
         var result = await _service.AddSpecialty(request.Name, request.Description);
-        return Ok(result);
+        return CreatedAtAction(nameof(AddSpecialty), result);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:Guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -45,7 +45,7 @@ public class SpecialtyController : AppController
         return Ok(result);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:Guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSpecialty([FromRoute] Guid id)

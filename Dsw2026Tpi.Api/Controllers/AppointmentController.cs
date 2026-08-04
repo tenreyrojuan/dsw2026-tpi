@@ -4,6 +4,7 @@ using Dsw2026Tpi.CrossCutting.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
@@ -20,31 +21,31 @@ public class AppointmentController : AppController
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddAppointment([FromBody]AppointmentModel.Request request)
     {
         var result = await _service.AddAppointment(request);
-        return Ok(result);
+        return CreatedAtAction(nameof(AddAppointment),result);
     }
 
     [HttpGet("patient")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetPatientAppointment([FromQuery] string dni)
+    public async Task<IActionResult> GetPatientAppointment([FromQuery] long dni)
     {
         var result = await _service.GetPatientAppointment(dni);
         return Ok(result);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:Guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAppointment([FromRoute] Guid id)
     {
-        var result = await _service.DeleteAppointment(id);
-        return Ok(result);
+        await _service.DeleteAppointment(id);
+        return Ok();
     }
 }
