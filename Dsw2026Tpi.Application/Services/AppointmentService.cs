@@ -8,7 +8,7 @@ using Dsw2026Tpi.Domain.Interfaces;
 
 namespace Dsw2026Tpi.Application.Services;
 
-public class AppointmentService : IAppointmentService
+internal sealed class AppointmentService : IAppointmentService
 {
     private readonly IPersistence _persistence;
 

@@ -13,7 +13,7 @@ using System.Data;
 
 namespace Dsw2026Tpi.Application.Services;
 
-public class AuthenticationService : IAuthenticationService
+internal sealed class AuthenticationService : IAuthenticationService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ISignInService _signInManager;

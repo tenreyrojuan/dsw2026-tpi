@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace Dsw2026Tpi.Application.Services;
 
-public class AdvancedSearchesService : IAdvancedSearchesService
+internal sealed class AdvancedSearchesService : IAdvancedSearchesService
 {
     private readonly IPersistence _persistence;
 

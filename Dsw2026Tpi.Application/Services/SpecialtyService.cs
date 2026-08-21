@@ -8,7 +8,7 @@ using Dsw2026Tpi.Domain.Interfaces;
 
 namespace Dsw2026Tpi.Application.Services;
 
-public class SpecialtyService : ISpecialtyService
+internal sealed class SpecialtyService : ISpecialtyService
 {
     private readonly IPersistence _persistence;
 

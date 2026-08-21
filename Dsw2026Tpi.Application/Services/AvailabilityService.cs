@@ -8,7 +8,7 @@ using Dsw2026Tpi.Domain.Interfaces;
 
 namespace Dsw2026Tpi.Application.Services;
 
-public class AvailabilityService : IAvailabilityService
+internal sealed class AvailabilityService : IAvailabilityService
 {
     private readonly IPersistence _persistence;
     public AvailabilityService(IPersistence persistence)

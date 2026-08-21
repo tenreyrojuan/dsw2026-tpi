@@ -11,7 +11,7 @@ using System.Globalization;
 
 namespace Dsw2026Tpi.Application.Services;
 
-public class DoctorService : IDoctorService
+internal sealed class DoctorService : IDoctorService
 {
     private readonly IPersistence _persistence;
 
@@ -21,7 +21,7 @@ public class DoctorService : IDoctorService
     }
     public async Task<Pagination<DoctorModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
-        var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, 
+            var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, 
                                                    d => d.IsActive == true && (string.IsNullOrWhiteSpace(name) ||
                                                    d.Name.Contains(name)), x => x.Name, nameof(Doctor.Specialty));
         

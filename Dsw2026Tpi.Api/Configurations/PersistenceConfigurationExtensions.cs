@@ -1,4 +1,5 @@
-﻿using Dsw2026Tpi.Data;
+﻿using System.Runtime.InteropServices;
+using Dsw2026Tpi.Data;
 using Dsw2026Tpi.Data.Extensions;
 using Dsw2026Tpi.Data.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -13,19 +14,28 @@ public static class PersistenceConfigurationExtensions
     {
         //Obtener cadena de conexión desde appsettings.json
         var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var sqliteConnection = configuration.GetConnectionString("SqliteConnection");
 
         //Agregar contexto (O/RM) y utilizar SQL Server para DB
+        
         services.AddDbContext<Dsw2026TpiDbContext>(options =>
         {
-            options.UseSqlServer(connectionString);
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                options.UseSqlServer(connectionString);
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                options.UseSqlite(sqliteConnection);
         });
 
         services.AddDbContext<AuthenticationDbContext>(options =>
         {
-            options.UseSqlServer(connectionString);
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                options.UseSqlServer(connectionString);
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                options.UseSqlite(sqliteConnection);
             options.UseSeeding((c, t) =>
             {
-                c.Seedwork<IdentityRole>("Sources\\roles.json");
+                var rolesPath = Path.Combine(AppContext.BaseDirectory, "Sources", "roles.json");
+                c.Seedwork<IdentityRole>(rolesPath);
             });
         });
         return services;

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Dsw2026Tpi.Application.Services;
 
-public class JwtService
+internal sealed class JwtService
 {
     private readonly IConfiguration _config;
     public JwtService(IConfiguration config)
