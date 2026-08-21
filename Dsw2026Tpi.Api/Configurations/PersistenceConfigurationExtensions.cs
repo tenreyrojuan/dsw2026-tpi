@@ -28,10 +28,15 @@ public static class PersistenceConfigurationExtensions
 
         services.AddDbContext<AuthenticationDbContext>(options =>
         {
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
                 options.UseSqlServer(connectionString);
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            }
+            else
+            {
                 options.UseSqlite(sqliteConnection);
+            }
+            
             options.UseSeeding((c, t) =>
             {
                 var rolesPath = Path.Combine(AppContext.BaseDirectory, "Sources", "roles.json");

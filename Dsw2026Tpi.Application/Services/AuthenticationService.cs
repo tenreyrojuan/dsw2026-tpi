@@ -144,7 +144,7 @@ internal sealed class AuthenticationService : IAuthenticationService
         if (!request.Email.IsEmailValid())
             throw new ValidationException()
                 .WithDetail(nameof(request.Email), Issue.INVALID_EMAIL);
-
+        
         var user = new ApplicationUser(request.Email, request.Email);
 
         var result = await _userManager.CreateAsync(user, request.Password);
