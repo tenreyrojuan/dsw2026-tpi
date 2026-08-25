@@ -29,8 +29,8 @@ internal sealed class AvailabilityService : IAvailabilityService
         ICollection<AvailabilityRule> finalAvailabilities
             = CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear, now);
 
-        var disps = await _persistence.AddRange(finalAvailabilities);
-
+        var disps = _persistence.AddRange(finalAvailabilities);
+        _ = _persistence.SaveChangesAsync();
         return new AvailabilityModel.Response(doctor.Id,
             disps.Select(a =>
             new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));
@@ -49,15 +49,16 @@ internal sealed class AvailabilityService : IAvailabilityService
         // se listan las disponibilidades que son de este mes, este año y ademas no tienen slots ocupados
         var availabilitiesToDelete = doctor.AvailabilityRules
            .Where(a => a.Month == currentMonth && a.Year == currentYear &&
-                 !a.AvailabilitySlots.Any(s => s.AvailabilitySlotState == AvailabilitySlotState.BOOKED))
+                 a.AvailabilitySlots.Any(s => s.AvailabilitySlotState == AvailabilitySlotState.BOOKED))
            .ToArray();
-        _ = await _persistence.RemoveRange<AvailabilityRule>(availabilitiesToDelete);
+        _ = _persistence.RemoveRange(availabilitiesToDelete);
 
         ICollection<AvailabilityRule> finalAvailabilities =
             CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear, now);
 
-        var disps = await _persistence.AddRange(finalAvailabilities);
-
+        var disps = _persistence.AddRange(finalAvailabilities);
+        _ = _persistence.SaveChangesAsync();
+        
         return new AvailabilityModel.Response(doctor.Id,
             finalAvailabilities.Select(a =>
             new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));

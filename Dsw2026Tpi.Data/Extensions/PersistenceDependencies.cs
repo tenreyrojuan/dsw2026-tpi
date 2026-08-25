@@ -8,6 +8,7 @@ public static class PersistenceDependencies
     public static IServiceCollection AddPersistenceDependencies(this IServiceCollection services)
     {
         services.AddScoped<IPersistence, PersistenceEf>();
+        services.AddScoped<IUnitOfWork,UnitOfWork>();
         return services;
     }
 }

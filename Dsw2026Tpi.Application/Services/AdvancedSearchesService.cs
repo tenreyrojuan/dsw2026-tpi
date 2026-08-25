@@ -5,6 +5,7 @@ using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 using System.Linq.Expressions;
+using Dsw2026Tpi.Domain.Specifications;
 
 namespace Dsw2026Tpi.Application.Services;
 
@@ -18,8 +19,8 @@ internal sealed class AdvancedSearchesService : IAdvancedSearchesService
     }
     public async Task<IEnumerable<AppointmentModel.Response>> GetAllDailyAppointments(DateOnly date)
     {
-        var todaysAppointments
-            = await _persistence.GetFiltered<Appointment>(a => a.AvailabilitySlot.Date == date, nameof(Patient), nameof(AvailabilitySlot));
+        var spec = new TodaysAppointmentsSpecification(date);
+        var todaysAppointments = await _persistence.GetFiltered(spec);
 
         return todaysAppointments is null ? [] :
             todaysAppointments.Select(
@@ -29,29 +30,20 @@ internal sealed class AdvancedSearchesService : IAdvancedSearchesService
     public async Task<Pagination<AdvancedSearchesModel.AppointmentSearchResponse>> SearchAppointments(int pageSize, int pageIndex, Guid specialtyId, Guid doctorId, long dni, DateOnly date)
     {
 
-        var doctor = await _persistence.GetById<Doctor>(doctorId)
-            ?? throw new EntityNotFoundException(nameof(Doctor))
+        var doctorExists = await _persistence.Any<Doctor>(d => d.Id == doctorId);
+        if(!doctorExists)
+            throw new EntityNotFoundException(nameof(Doctor))
             .WithDetail(nameof(doctorId), Issue.ID_NOTFOUND);
 
-        var specialty = await _persistence.GetById<Specialty>(specialtyId)
-            ?? throw new EntityNotFoundException(nameof(Specialty))
+        var specialtyExists = await _persistence.Any<Specialty>(s => s.Id == specialtyId);
+        if(!specialtyExists)
+            throw new EntityNotFoundException(nameof(Specialty))
             .WithDetail(nameof(specialtyId), Issue.ID_NOTFOUND);
 
         var patientDni = dni.ToString();
-        Expression<Func<Appointment, bool>> predicate
-            = a => a.AvailabilitySlot.AvailabilityRule.DoctorId == doctorId &&
-                   a.AvailabilitySlot.AvailabilityRule.Doctor.SpecialtyId == specialtyId &&
-                   a.AvailabilitySlot.Date == date &&
-                   a.Patient.Dni == patientDni;
 
-        Expression<Func<Appointment, DateOnly>> sortOrder
-            = a => a.AvailabilitySlot.Date;
-
-        string[] includes = {
-            $"{nameof(AvailabilitySlot)}.{nameof(AvailabilityRule)}.{nameof(Doctor)}.{nameof(Specialty)}",
-            $"{nameof(Patient)}"
-        };
-        var appointments = await _persistence.Paginate<Appointment, DateOnly>(pageSize, pageIndex, predicate, sortOrder, includes);
+        var spec = new DailyAppointmentByDateSpecification(doctorId, specialtyId, date, patientDni);
+        var appointments = await _persistence.Paginate<Appointment, DateOnly>(pageSize, pageIndex,spec);
 
         return appointments.Map(a => new AdvancedSearchesModel.AppointmentSearchResponse(
             a.Id,

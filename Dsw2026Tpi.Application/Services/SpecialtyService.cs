@@ -5,6 +5,7 @@ using Dsw2026Tpi.CrossCutting.Helpers;
 using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
+using Dsw2026Tpi.Domain.Specifications;
 
 namespace Dsw2026Tpi.Application.Services;
 
@@ -18,9 +19,8 @@ internal sealed class SpecialtyService : ISpecialtyService
     }
     public async Task<Pagination<SpecialtyModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
-        var specialties = await _persistence.Paginate<Specialty, string>(pageSize, pageIndex,
-                                                   e => string.IsNullOrWhiteSpace(name) ||
-                                                   e.Name.Contains(name), x => x.Name);
+        var spec = new SpecialtiesByNameSpecification(name);
+        var specialties = await _persistence.Paginate<Specialty, string>(pageSize, pageIndex, spec);
 
         return specialties.Map(e => new SpecialtyModel.Response(e.Id, e.Name, e.Description));
     }
@@ -41,7 +41,8 @@ internal sealed class SpecialtyService : ISpecialtyService
                 .WithDetail(nameof(name), Issue.DUPLICATE_SPECIALTY);
         
         var specialty = new Specialty(name, description);
-        var created = await _persistence.Add<Specialty>(specialty);
+        var created = _persistence.Add(specialty);
+        _ = await _persistence.SaveChangesAsync();
         
         return new SpecialtyModel.Response(created.Id, created.Name, created.Description);
     }
@@ -58,8 +59,10 @@ internal sealed class SpecialtyService : ISpecialtyService
 
         specialty.UpdateSpecialty(name, description);
 
-        var updated = await _persistence.Update<Specialty>(specialty);
-        return new SpecialtyModel.Response(updated.Id, updated.Name, updated.Description);
+        //var updated = _persistence.Update<Specialty>(specialty);
+        _ = await _persistence.SaveChangesAsync();
+        
+        return new SpecialtyModel.Response(specialty.Id, specialty.Name, specialty.Description);
     }
     
     public async Task DeleteSpecialty(Guid id)
@@ -69,7 +72,8 @@ internal sealed class SpecialtyService : ISpecialtyService
             .WithDetail(nameof(id), Issue.ID_NOTFOUND);
 
         specialty.SetDelete();
-        _ = await _persistence.Update<Specialty>(specialty);
+        //_ =  _persistence.Update<Specialty>(specialty);
+        _ = await _persistence.SaveChangesAsync();
     }
 
 }

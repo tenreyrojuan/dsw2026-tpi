@@ -2,6 +2,7 @@
 using Dsw2026Tpi.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using Dsw2026Tpi.Data.Specifications;
 
 namespace Dsw2026Tpi.Data;
 
@@ -14,39 +15,36 @@ internal sealed class PersistenceEf : IPersistence
         _context = context;
     }
 
-    public async Task<T> Add<T>(T entity) where T : EntityBase
+    public T Add<T>(T entity) where T : EntityBase
     {
-        await _context.AddAsync(entity);
-        await _context.SaveChangesAsync();
+        _context.Add(entity);
         return entity;
     }
 
-    public async Task<T> Delete<T>(T entity) where T : EntityBase
+    public T Delete<T>(T entity) where T : EntityBase
     {
-        var a = entity.Id;
         _context.Remove(entity);
-        await _context.SaveChangesAsync();
         return entity;
     }
 
-    public async Task<T?> First<T>(Expression<Func<T, bool>> predicate, params string[] include) where T : EntityBase
+    public async Task<T?> First<T>(Expression<Func<T,bool>> predicate,params string[] includes) where T : EntityBase
     {
-        return await Include(_context.Set<T>(), include).FirstOrDefaultAsync(predicate);
+        return await Include(_context.Set<T>(),includes).FirstOrDefaultAsync(predicate);
+    }
+    
+    public async Task<IEnumerable<T>?> GetAll<T>(ISpecification<T> spec) where T : EntityBase
+    {
+        return await ApplySpecification(spec).ToListAsync();
     }
 
-    public async Task<IEnumerable<T>?> GetAll<T>(params string[] include) where T : EntityBase
+    public async Task<T?> GetById<T>(Guid id, params string[] includes) where T : EntityBase
     {
-        return await Include(_context.Set<T>(), include).ToListAsync();
+        return await Include(_context.Set<T>(), includes).FirstOrDefaultAsync(e => e.Id == id);
     }
 
-    public async Task<T?> GetById<T>(Guid id, params string[] include) where T : EntityBase
+    public async Task<IEnumerable<T>?> GetFiltered<T>(ISpecification<T> spec) where T : EntityBase
     {
-        return await Include(_context.Set<T>(), include).FirstOrDefaultAsync(e => e.Id == id);
-    }
-
-    public async Task<IEnumerable<T>?> GetFiltered<T>(Expression<Func<T, bool>> predicate, params string[] include) where T : EntityBase
-    {
-        return await Include(_context.Set<T>(), include).Where(predicate).ToListAsync();
+        return await ApplySpecification(spec).ToListAsync();
     }
     /// <summary>
     /// Sirve para verificar la existe de alguna entidad sin traerla a la memoria.
@@ -66,32 +64,28 @@ internal sealed class PersistenceEf : IPersistence
     /// Al parecer EF no trackeaba los cambios de la coleccion
     /// </summary>
 
-    public async Task<IEnumerable<T>> AddRange<T>(IEnumerable<T> entities) where T : EntityBase
+    public IEnumerable<T> AddRange<T>(IEnumerable<T> entities) where T : EntityBase
     {
-        await _context.AddRangeAsync(entities);
-        await _context.SaveChangesAsync();
+        _context.AddRange(entities);
         return entities;
     }
-    public async Task<IEnumerable<T>> RemoveRange<T>(IEnumerable<T> entities) where T : EntityBase
+    public IEnumerable<T> RemoveRange<T>(IEnumerable<T> entities) where T : EntityBase
     {
         _context.RemoveRange(entities);
-        await _context.SaveChangesAsync();
         return entities;
     }
-    public async Task<T> Update<T>(T entity) where T : EntityBase
+    public T Update<T>(T entity) where T : EntityBase
     {
         _context.Update(entity);
-        await _context.SaveChangesAsync();
         return entity;
     }
-    public async Task<Pagination<T>> Paginate<T, TKey>(int pageSize, int pageIndex, Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> sortOrder, params string[] includes) where T : EntityBase
+    public async Task<Pagination<T>> Paginate<T, TKey>(int pageSize, int pageIndex,
+        ISpecification<T> spec) where T : EntityBase
     {
         pageSize = Math.Abs(pageSize);
         pageIndex = Math.Abs(pageIndex) == 0 ? 0 : Math.Abs(pageIndex) - 1;
 
-        var filtered = Include(_context.Set<T>(), includes)
-                 .Where(predicate)
-                 .OrderBy(sortOrder);
+        var filtered = ApplySpecification(spec);
 
         var total = await filtered.CountAsync();
 
@@ -131,6 +125,11 @@ internal sealed class PersistenceEf : IPersistence
         }
     }
 
+    public async Task<int> SaveChangesAsync()
+    {
+        return await _context.SaveChangesAsync();
+    }
+
     private static IQueryable<T> Include<T>(IQueryable<T> query, string[] includes) where T : EntityBase
     {
         var includedQuery = query;
@@ -140,5 +139,10 @@ internal sealed class PersistenceEf : IPersistence
             includedQuery = includedQuery.Include(include);
         }
         return includedQuery;
+    }
+
+    private IQueryable<T> ApplySpecification<T>(ISpecification<T> spec)  where T : EntityBase
+    {
+        return _context.Set<T>().GetQuery(spec);
     }
 }

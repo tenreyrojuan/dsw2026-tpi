@@ -5,6 +5,7 @@ using Dsw2026Tpi.CrossCutting.Helpers;
 using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
+using Dsw2026Tpi.Domain.Specifications;
 
 namespace Dsw2026Tpi.Application.Services;
 
@@ -52,11 +53,12 @@ internal sealed class AppointmentService : IAppointmentService
 
         var newAppointment = new Appointment(patient, availabilitySlot, request.Reason);
 
-        var appointment = await _persistence.Add<Appointment>(newAppointment);
+        var appointment = _persistence.Add(newAppointment);
 
         availabilitySlot.Book(newAppointment);
-        _ = await _persistence.Update<AvailabilitySlot>(availabilitySlot);
-
+        //_ = _persistence.Update(availabilitySlot);
+        _ = await _persistence.SaveChangesAsync();
+        
         return new AppointmentModel.Response(appointment.Patient.FullName, availabilitySlot.Date, availabilitySlot.StartingTime);
     }
 
@@ -64,9 +66,8 @@ internal sealed class AppointmentService : IAppointmentService
     {
         var dni = patientDni.ToString();
         DateOnly today = DateOnly.FromDateTime(DateTime.Now);
-        var appointment = await _persistence.GetFiltered<Appointment>(
-            a => a.Patient.Dni == dni && a.AppointmentState == AppointmentState.BOOKED && a.AvailabilitySlot.Date >= today, 
-            nameof (Patient), nameof(AvailabilitySlot));
+        var spec = new PatientBookedAppointmentSpecification(dni, today);
+        var appointment = await _persistence.GetFiltered(spec);
         
         return appointment is null ? [] : 
             appointment.Select(a => new AppointmentModel.Response(
@@ -75,8 +76,7 @@ internal sealed class AppointmentService : IAppointmentService
 
     public async Task DeleteAppointment (Guid appointmentId)
     {
-        var appointment = await _persistence.GetById<Appointment>(
-            appointmentId, nameof(Patient), nameof(AvailabilitySlot))
+        var appointment = await _persistence.GetById<Appointment>(appointmentId)
             ?? throw new EntityNotFoundException(nameof(Appointment))
                 .WithDetail(nameof(appointmentId), Issue.ID_NOTFOUND);
 
@@ -85,7 +85,8 @@ internal sealed class AppointmentService : IAppointmentService
                 .WithDetail(nameof(appointment.AppointmentState), Issue.UNBOOKED_SLOT);
 
         appointment.Cancel();
-        _ = await _persistence.Update<Appointment>(appointment);
+        //_ = _persistence.Update<Appointment>(appointment);
+        _ = await _persistence.SaveChangesAsync();
     }
 
 }

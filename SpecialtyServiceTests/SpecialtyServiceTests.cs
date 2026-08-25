@@ -31,7 +31,7 @@ public class SpecialtyServiceTests
 
         var paginatedResult = new Pagination<Specialty>(pageSize, pageIndex, specialtiesList, specialtiesList.Count);
 
-        _mockPersistence.Paginate<Specialty, string>(pageSize, pageIndex, Arg.Any<Expression<Func<Specialty, bool>>>(),Arg.Any<Expression<Func<Specialty, string>>>())
+        _mockPersistence.Paginate<Specialty, string>(pageSize, pageIndex,  Arg.Any<ISpecification<Specialty>>())
             .Returns(paginatedResult);
 
         var service = new SpecialtyService(_mockPersistence);
@@ -47,7 +47,7 @@ public class SpecialtyServiceTests
         Assert.IsType<SpecialtyModel.Response>(result.Data.First());
         Assert.Equal("Cardiología", result.Data.First().Name);
 
-        await _mockPersistence.Received(1).Paginate<Specialty, string>(pageSize, pageIndex, Arg.Any<Expression<Func<Specialty, bool>>>(), Arg.Any<Expression<Func<Specialty, string>>>());
+        await _mockPersistence.Received(1).Paginate<Specialty, string>(pageSize, pageIndex, Arg.Any<ISpecification<Specialty>>());
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class SpecialtyServiceTests
         Assert.Equal(name, result.Name);
         Assert.Equal(description, result.Description);
 
-        await _mockPersistence.Received(1).Add(Arg.Any<Specialty>());
+        _mockPersistence.Received(1).Add(Arg.Any<Specialty>());
     }
     
     [Fact]
@@ -107,7 +107,7 @@ public class SpecialtyServiceTests
         Assert.Equal(newName, result.Name);
         Assert.Equal(newDescription, result.Description);
 
-        await _mockPersistence.Received(1).Update(Arg.Any<Specialty>());
+        _mockPersistence.Received(1).Update(Arg.Any<Specialty>());
     }
 
     [Fact]
@@ -123,6 +123,6 @@ public class SpecialtyServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<EntityNotFoundException>(() => service.DeleteSpecialty(id));
-        await _mockPersistence.DidNotReceive().Update(Arg.Any<Specialty>());
+        _mockPersistence.DidNotReceive().Update(Arg.Any<Specialty>());
     }
 }
