@@ -17,6 +17,8 @@ public class Program
 
         try
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            
             Log.Information("Iniciando aplicación Dsw2026Tpi.Api");
 
             var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +34,7 @@ public class Program
             builder.Services.AddAppDependencies();
             builder.Services.AddControllers();
             builder.Services.AddHealthChecks();
+            
 
             var app = builder.Build();
 

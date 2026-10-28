@@ -14,7 +14,7 @@ public static class PersistenceConfigurationExtensions
     {
         //Obtener cadena de conexión desde appsettings.json
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        var sqliteConnection = configuration.GetConnectionString("SqliteConnection");
+        var alternateConnection = configuration.GetConnectionString("AlternateConnection");
 
         //Agregar contexto (O/RM) y utilizar SQL Server para DB
         
@@ -22,8 +22,8 @@ public static class PersistenceConfigurationExtensions
         {
             if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 options.UseSqlServer(connectionString);
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                options.UseSqlite(sqliteConnection);
+            else
+                options.UseNpgsql(alternateConnection);
         });
 
         services.AddDbContext<AuthenticationDbContext>(options =>
@@ -34,7 +34,7 @@ public static class PersistenceConfigurationExtensions
             }
             else
             {
-                options.UseSqlite(sqliteConnection);
+                options.UseNpgsql(alternateConnection);
             }
             
             options.UseSeeding((c, t) =>
