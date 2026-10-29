@@ -1,4 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using Dsw2026Tpi.CrossCutting.Exceptions;
+using Dsw2026Tpi.CrossCutting.Resources;
 
 namespace Dsw2026Tpi.CrossCutting.Helpers;
 
@@ -33,5 +35,10 @@ public static class ValidationsExtensions
     public static bool IsDescriptionValid(this string? description)
     {
         return !string.IsNullOrWhiteSpace(description) && description.Length >= 10 && description.Length <= 100;
+    }
+
+    public static bool IsTimeRangeValid(TimeOnly start, TimeOnly end)
+    {
+        return start < end;
     }
 }

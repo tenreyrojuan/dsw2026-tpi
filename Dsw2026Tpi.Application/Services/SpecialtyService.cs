@@ -71,5 +71,4 @@ internal sealed class SpecialtyService : ISpecialtyService
         specialty.SetDelete();
         _ = await _persistence.Update<Specialty>(specialty);
     }
-
 }

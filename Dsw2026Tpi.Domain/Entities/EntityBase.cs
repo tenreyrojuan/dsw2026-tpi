@@ -6,7 +6,7 @@ public abstract class EntityBase(Guid? id = null)
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
-
+    
     public bool Deleted { get; private set; } = false;
 
     public void SetDelete()
@@ -19,4 +19,5 @@ public abstract class EntityBase(Guid? id = null)
     {
         UpdatedAt = DateTime.Now;
     }
+    
 }

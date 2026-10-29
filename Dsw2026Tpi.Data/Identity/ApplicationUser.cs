@@ -11,7 +11,7 @@ public sealed class ApplicationUser: IdentityUser
     public ApplicationUser(string userName, string email)
         : base(userName) 
     {
-        Email = email;
+        Email = email;  
     }
     public void SetDelete()
     {
