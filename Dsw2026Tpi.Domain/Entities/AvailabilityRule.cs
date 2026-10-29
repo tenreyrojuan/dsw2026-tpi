@@ -1,18 +1,10 @@
-﻿namespace Dsw2026Tpi.Domain.Entities;
+﻿using Dsw2026Tpi.CrossCutting.Exceptions;
+
+namespace Dsw2026Tpi.Domain.Entities;
 //Disponibilidad
 public sealed class AvailabilityRule : EntityBase
 {
-    public int Month { get; init; }
-    public int Year { get; init; }
-
-    public DayOfWeek WeekDay { get; private set; }
-    public TimeOnly StartingHour { get; private set; }
-    public TimeOnly EndingHour { get; private set; }
-
-    public Guid DoctorId { get; private set; }
-    public Doctor Doctor { get; private set; }
-
-    public ICollection<AvailabilitySlot> AvailabilitySlots { get; private set; } = [];
+    private readonly List<AvailabilitySlot> _availabilitySlots = new();
 
     #region Constructor for EF
 #pragma warning disable CS8618
@@ -21,8 +13,16 @@ public sealed class AvailabilityRule : EntityBase
     }
 #pragma warning restore CS8618
     #endregion
-    public AvailabilityRule(int month, int year, DayOfWeek weekDay, TimeOnly startingHour,
-        TimeOnly endingHour, Doctor doctor, Guid? id = null) : base(id)
+    
+    private AvailabilityRule(
+        int month, 
+        int year, 
+        DayOfWeek weekDay,
+        TimeOnly startingHour,
+        TimeOnly endingHour, 
+        Doctor doctor, 
+        Guid? id = null) 
+        : base(id)
     {
         Month = month;
         Year = year;
@@ -31,14 +31,53 @@ public sealed class AvailabilityRule : EntityBase
         EndingHour = endingHour;
         Doctor = doctor;
     }
-
-    public void UpdateAvailability(DayOfWeek weekDay, TimeOnly startingHour, TimeOnly endingHour)
+    
+    internal static AvailabilityRule Create(
+        int month, 
+        int year, 
+        DayOfWeek weekDay, 
+        TimeOnly startingHour,
+        TimeOnly endingHour, 
+        Doctor doctor)
     {
-        WeekDay = weekDay;
-        StartingHour = startingHour;
-        EndingHour = endingHour;
-        UpdateTimestamp();
+        if (month < 1 || month > 12)
+        {
+            throw new BusinessRuleException()
+                .WithDetail(nameof(month), "Mes invalido.");
+        }
+
+        if (year < DateTime.Now.Year)
+        {
+            throw new BusinessRuleException()
+                .WithDetail(nameof(year), "Año invalido.");
+        }
+        if (startingHour >= endingHour)
+        {
+            throw new BusinessRuleException()
+                .WithDetail(
+                    $"{nameof(startingHour)} and {nameof(endingHour)}",
+                    "El tiempo de comienzo no puede ser menor a la de final");
+        }
+        
+        return new AvailabilityRule(month, year, weekDay, startingHour, endingHour, doctor);
     }
+    
+    public int Month { get; private set; }
+    public int Year { get; private set; }
+
+    public DayOfWeek WeekDay { get; private set; }
+    public TimeOnly StartingHour { get; private set; }
+    public TimeOnly EndingHour { get; private set; }
+
+    public Guid DoctorId { get; private set; }
+    public Doctor Doctor { get; private set; }
+    
+    public IReadOnlyCollection<AvailabilitySlot> AvailabilitySlots => _availabilitySlots.AsReadOnly();
+
+    public bool IsOfMonth(int currentMonth, int currentYear) => Month == currentMonth && Year == currentYear;
+    
+    public bool HasBookedSlots => _availabilitySlots.Any(s => s.IsBooked);
+    
 
     public bool HasOverlappingSchedules(TimeOnly requestedStart, TimeOnly requestedEnd)
     {
@@ -76,7 +115,7 @@ public sealed class AvailabilityRule : EntityBase
             if (currentEnd > EndingHour)
                 break;
 
-            AvailabilitySlots.Add(new AvailabilitySlot(date, currentStart, currentEnd, this));
+            _availabilitySlots.Add(AvailabilitySlot.Create(date, currentStart, currentEnd, this));
 
             currentStart = currentEnd;
         }

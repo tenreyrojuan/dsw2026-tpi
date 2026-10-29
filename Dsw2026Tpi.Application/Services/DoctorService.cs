@@ -69,7 +69,7 @@ internal sealed class DoctorService : IDoctorService
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
             .WithDetail(nameof(request.SpecialtyId), Issue.ID_NOTFOUND);
 
-        var newDoctor = await _persistence.Add<Doctor>(new Doctor(request.Name, request.LicenseNumber, specialty));
+        var newDoctor = await _persistence.Add<Doctor>(Doctor.Create(request.Name, request.LicenseNumber, specialty));
         return new DoctorModel.Response(newDoctor.Id, newDoctor.Name,newDoctor.LicenseNumber,
             new DoctorModel.SpecialtyDto(newDoctor.Specialty?.Id, newDoctor.Specialty?.Name));
     }

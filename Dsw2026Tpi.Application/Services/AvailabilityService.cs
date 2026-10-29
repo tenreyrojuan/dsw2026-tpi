@@ -1,6 +1,7 @@
 ﻿using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Exceptions;
+using Dsw2026Tpi.CrossCutting.Helpers;
 using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Data.Extensions;
 using Dsw2026Tpi.Domain.Entities;
@@ -22,17 +23,29 @@ internal sealed class AvailabilityService : IAvailabilityService
             ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
             .WithDetail(nameof(request.DoctorId), Issue.ID_NOTFOUND);
 
+        foreach (var day in request.Days)
+        {
+            if (!ValidationsExtensions.IsTimeRangeValid(day.StartTime, day.EndTime))
+                throw new BusinessRuleException()
+                    .WithDetail(nameof(day), Issue.INVALID_TIME_ERROR);
+        }
+        
         var now = DateTime.Now;
         var currentMonth = now.Month;
         var currentYear = now.Year;
+        
+        var holidays = HolidaySeed.LoadHolidays();
 
-        ICollection<AvailabilityRule> finalAvailabilities
-            = CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear, now);
+        var days = request.Days
+            .Select(d => (d.Day, d.StartTime, d.EndTime))
+            .ToList();
+        
+        var finalAvailabilities = doctor.CreateFinalAvailabilities(days, holidays, currentMonth, currentYear, now);
 
-        var disps = await _persistence.AddRange(finalAvailabilities);
+        var rules = await _persistence.AddRange(finalAvailabilities);
 
         return new AvailabilityModel.Response(doctor.Id,
-            disps.Select(a =>
+            rules.Select(a =>
             new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));
     }
 
@@ -42,78 +55,33 @@ internal sealed class AvailabilityService : IAvailabilityService
             ?? throw new EntityNotFoundException(nameof(Doctor))
             .WithDetail(nameof(request.DoctorId), Issue.ID_NOTFOUND);
 
+        foreach (var day in request.Days)
+        {
+            if (!ValidationsExtensions.IsTimeRangeValid(day.StartTime, day.EndTime))
+                throw new BusinessRuleException()
+                    .WithDetail(nameof(day), Issue.INVALID_TIME_ERROR);
+        }
+        
         var now = DateTime.Now;
         var currentMonth = now.Month;
         var currentYear = now.Year;
-
-        // se listan las disponibilidades que son de este mes, este año y ademas no tienen slots ocupados
-        var availabilitiesToDelete = doctor.AvailabilityRules
-           .Where(a => a.Month == currentMonth && a.Year == currentYear &&
-                 !a.AvailabilitySlots.Any(s => s.AvailabilitySlotState == AvailabilitySlotState.BOOKED))
-           .ToArray();
+        
+        var availabilitiesToDelete = doctor.GetAvailableMonthlyAvailabilityRules(currentMonth, currentYear);
         _ = await _persistence.RemoveRange<AvailabilityRule>(availabilitiesToDelete);
 
-        ICollection<AvailabilityRule> finalAvailabilities =
-            CreateFinalAvailabilities(request.Days, doctor, currentMonth, currentYear, now);
+        var holidays = HolidaySeed.LoadHolidays();
+        
+        var days = request.Days
+            .Select(d => (d.Day, d.StartTime, d.EndTime))
+            .ToList();
+        
+        var finalAvailabilities = doctor.CreateFinalAvailabilities(days, holidays, currentMonth, currentYear, now);
 
-        var disps = await _persistence.AddRange(finalAvailabilities);
+        var rules = await _persistence.AddRange(finalAvailabilities);
 
         return new AvailabilityModel.Response(doctor.Id,
-            finalAvailabilities.Select(a =>
-            new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour, a.EndingHour)));
-
+            rules.Select(
+                a => new AvailabilityModel.DayScheduleRequest(a.WeekDay.ToString(), a.StartingHour,a.EndingHour)) 
+            );
     }
-    private ICollection<AvailabilityRule> CreateFinalAvailabilities(
-        IEnumerable<AvailabilityModel.DayScheduleRequest> days,
-        Doctor doctor,
-        int currentMonth, int currentYear,
-        DateTime now)
-    {
-        var holidays = HolidaySeed.LoadHolidays();
-
-        ICollection<AvailabilityRule> createdAvailabilities = [];
-        foreach (var day in days)
-        {
-            if (day.StartTime >= day.EndTime)
-                throw new BusinessRuleException()
-                    .WithDetail(nameof(day), Issue.INVALID_TIME_ERROR);
-
-            DayOfWeek weekDay = ParseDayOfWeek(day.Day);
-
-            bool hasOverlap = doctor.AvailabilityRules.Any(a =>
-            a.Month == currentMonth &&
-            a.Year == currentYear &&
-            a.WeekDay == weekDay &&
-            a.HasOverlappingSchedules(day.StartTime, day.EndTime));
-
-            if (hasOverlap)
-                throw new ConflictException()
-                    .WithDetail(nameof(hasOverlap), Issue.OVERLAP);
-
-            var availabilityRule = new AvailabilityRule(currentMonth, currentYear, weekDay, day.StartTime, day.EndTime, doctor);
-
-            availabilityRule.GenerateMonthlyAvailabilitySlots(now.Day, holidays);
-
-            createdAvailabilities.Add(availabilityRule);
-        }
-        return createdAvailabilities;
-    }
-    private static DayOfWeek ParseDayOfWeek(string day)
-    {
-        if (Enum.TryParse<DayOfWeek>(day, true, out var weekDay))
-            return weekDay;
-
-        return day.ToLower() switch
-        {
-            "domingo" => DayOfWeek.Sunday,
-            "lunes" => DayOfWeek.Monday,
-            "martes" => DayOfWeek.Tuesday,
-            "miercoles" or "miércoles" => DayOfWeek.Wednesday,
-            "jueves" => DayOfWeek.Thursday,
-            "viernes" => DayOfWeek.Friday,
-            "sabado" or "sábado" => DayOfWeek.Saturday,
-            _ => throw new ValidationException().WithDetail(nameof(day), Issue.INVALID_DAY)
-        };
-    }
-
 }

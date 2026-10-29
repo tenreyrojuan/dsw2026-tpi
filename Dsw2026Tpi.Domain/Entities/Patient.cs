@@ -2,13 +2,6 @@
 
 public sealed class Patient : EntityBase
 {
-    public string Dni { get; init; }
-    public string FullName { get; init; }
-
-    public Guid UserId { get; init; }
-
-    public ICollection<Appointment> Appointments { get; private set; } = [];
-
     #region Constructor for EF
 #pragma warning disable CS8618
     private Patient()
@@ -23,4 +16,12 @@ public sealed class Patient : EntityBase
         FullName = name;
         UserId = userId;
     }
+    
+    public string Dni { get; private set; }
+    public string FullName { get; private set; }
+
+    public Guid UserId { get; private set; }
+
+    private List<Appointment> _appointments = new();
+    public IReadOnlyCollection<Appointment> Appointments => _appointments.AsReadOnly();
 }
