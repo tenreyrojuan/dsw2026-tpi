@@ -17,7 +17,7 @@ public sealed class SlotService : ISlotService
 
     public async Task<Pagination<SlotModel.Response>> GetTodaysSlots(int pageSize, int pageIndex)
     {
-        var date = new DateOnly(2026, 10, 19);
+        var date = DateOnly.FromDateTime(DateTime.Now);
 
 
         var slots = await _persistence.Paginate<AvailabilitySlot, DateOnly>(pageSize, pageIndex, x => x.Date == date, x => x.Date);
