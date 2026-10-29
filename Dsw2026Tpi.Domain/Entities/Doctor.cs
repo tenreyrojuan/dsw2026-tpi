@@ -74,7 +74,7 @@ public sealed class Doctor : EntityBase
     
     public IReadOnlyCollection<AvailabilityRule> CreateFinalAvailabilities(
         IReadOnlyCollection<(string Day, TimeOnly StartTime, TimeOnly EndTime)> days,
-        IReadOnlyCollection<DateOnly> holidays,
+        IEnumerable<DateOnly> holidays,
         int currentMonth,
         int currentYear,
         DateTime now)

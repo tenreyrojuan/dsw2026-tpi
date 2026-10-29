@@ -2,6 +2,9 @@
 
 public sealed class Patient : EntityBase
 {
+
+    private List<Appointment> _appointments = new();
+    
     #region Constructor for EF
 #pragma warning disable CS8618
     private Patient()
@@ -22,6 +25,5 @@ public sealed class Patient : EntityBase
 
     public Guid UserId { get; private set; }
 
-    private List<Appointment> _appointments = new();
     public IReadOnlyCollection<Appointment> Appointments => _appointments.AsReadOnly();
 }

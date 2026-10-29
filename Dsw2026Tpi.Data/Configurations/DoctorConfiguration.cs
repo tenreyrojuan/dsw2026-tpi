@@ -25,5 +25,9 @@ public class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
             .WithMany()
             .HasForeignKey(d => d.SpecialtyId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(a => a.AvailabilityRules)
+        .HasField("_availabilityRules")
+        .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

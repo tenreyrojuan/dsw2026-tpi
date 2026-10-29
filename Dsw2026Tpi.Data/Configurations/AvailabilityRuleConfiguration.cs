@@ -27,5 +27,9 @@ public class AvailabilityRuleConfiguration : IEntityTypeConfiguration<Availabili
 
         builder.HasIndex(a => new { a.DoctorId, a.Year, a.Month, a.WeekDay, a.StartingHour, a.EndingHour })
                .IsUnique();
+
+        builder.Navigation(a => a.AvailabilitySlots)
+        .HasField("_availabilitySlots")
+        .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

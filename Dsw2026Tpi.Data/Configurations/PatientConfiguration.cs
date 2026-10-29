@@ -21,5 +21,9 @@ public class PatientConfiguration : IEntityTypeConfiguration<Patient>
 
         builder.Property(p => p.UserId).IsRequired();
         builder.HasIndex(p => p.UserId).IsUnique();
+
+        builder.Navigation(p => p.Appointments)
+        .HasField("_appointments")
+        .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
