@@ -3,7 +3,6 @@ using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.CrossCutting.Helpers;
 using Dsw2026Tpi.CrossCutting.Resources;
-using Dsw2026Tpi.Data.Extensions;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
 
@@ -12,9 +11,11 @@ namespace Dsw2026Tpi.Application.Services;
 internal sealed class AvailabilityService : IAvailabilityService
 {
     private readonly IPersistence _persistence;
-    public AvailabilityService(IPersistence persistence)
+    private readonly IHolidayProviderService _holidayProviderService;
+    public AvailabilityService(IPersistence persistence, IHolidayProviderService holidayProviderService)
     {
         _persistence = persistence;
+        _holidayProviderService = holidayProviderService;
     }
 
     public async Task<AvailabilityModel.Response> AddAvailability(AvailabilityModel.Request request)
@@ -34,7 +35,7 @@ internal sealed class AvailabilityService : IAvailabilityService
         var currentMonth = now.Month;
         var currentYear = now.Year;
         
-        var holidays = HolidaySeed.LoadHolidays();
+        var holidays = await _holidayProviderService.GetHolidays();
 
         var days = request.Days
             .Select(d => (d.Day, d.StartTime, d.EndTime))
@@ -69,8 +70,8 @@ internal sealed class AvailabilityService : IAvailabilityService
         var availabilitiesToDelete = doctor.GetAvailableMonthlyAvailabilityRules(currentMonth, currentYear);
         _ = await _persistence.RemoveRange<AvailabilityRule>(availabilitiesToDelete);
 
-        var holidays = HolidaySeed.LoadHolidays();
-        
+        var holidays = await _holidayProviderService.GetHolidays();
+
         var days = request.Days
             .Select(d => (d.Day, d.StartTime, d.EndTime))
             .ToList();
