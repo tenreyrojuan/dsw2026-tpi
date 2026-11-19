@@ -1,7 +1,9 @@
 using Dsw2026Tpi.Api.Configurations;
 using Dsw2026Tpi.Api.Middlewares;
+using Dsw2026Tpi.Data.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Serilog;
 
 namespace Dsw2026Tpi.Api;
@@ -35,8 +37,26 @@ public class Program
             builder.Services.AddControllers();
             builder.Services.AddHealthChecks();
             
-
             var app = builder.Build();
+            
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+                if (!await roleManager.RoleExistsAsync("Admin"))
+                    await roleManager.CreateAsync(new IdentityRole("Admin"));
+
+                var admin = await userManager.FindByEmailAsync("admin@medportal.com");
+                if (admin is null)
+                {
+                    admin = new ApplicationUser("admin", "admin@medportal.com") { EmailConfirmed = true };
+                    await userManager.CreateAsync(admin, "Admin!123");
+                }
+
+                if (!await userManager.IsInRoleAsync(admin, "Admin"))
+                    await userManager.AddToRoleAsync(admin, "Admin");
+            }
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
