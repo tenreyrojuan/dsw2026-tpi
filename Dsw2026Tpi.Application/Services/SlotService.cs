@@ -20,7 +20,8 @@ public sealed class SlotService : ISlotService
         var date = DateOnly.FromDateTime(DateTime.Now);
 
 
-        var slots = await _persistence.Paginate<AvailabilitySlot, DateOnly>(pageSize, pageIndex, x => x.Date == date, x => x.Date);
+        var slots 
+            = await _persistence.Paginate<AvailabilitySlot, DateOnly>(pageSize, pageIndex, x => x.Date == date && x.IsBooked, x => x.Date);
 
         return slots.Map(s => new SlotModel.Response(s.Id,s.Date,s.StartingTime,s.EndingTime));
     }
