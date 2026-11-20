@@ -8,6 +8,7 @@ namespace Dsw2026Tpi.Api.Controllers;
 /// </summary>
 [ApiController]
 [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+[AllowAnonymous]
 public abstract class AppController : ControllerBase
 {
 }
