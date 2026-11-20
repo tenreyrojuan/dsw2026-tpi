@@ -45,11 +45,7 @@ internal sealed class AuthenticationService : IAuthenticationService
         var user = await _userManager.FindByEmailAsync(request.Email)
             ?? throw new AuthenticationException()
                 .WithDetail(nameof(request.Email), Issue.EMAIL_NOTFOUND);
-        /*
-        if (await _userManager.IsInRoleAsync(user, Roles.Administrator))
-            throw new AuthenticationException()
-                .WithDetail(nameof(request.Email), Issue.DUPLICATE_EMAIL);
-        */
+
         var result = await _signInManager.CheckPassword(user, request.Password);
 
         if (!result)
@@ -88,11 +84,6 @@ internal sealed class AuthenticationService : IAuthenticationService
         // Usuario Existe
         if (user != null)
         {
-            /*
-            if (await _userManager.IsInRoleAsync(user, Roles.Patient))
-                throw new AuthenticationException()
-                    .WithDetail(nameof(request.Email), Issue.DUPLICATE_EMAIL);
-            */
             var patient = await _persistence.First<Patient>(p => p.UserId == Guid.Parse(user.Id))
                     ?? throw new AuthenticationException()
                     .WithDetail(nameof(request.Dni), Issue.DNI_NOTFOUND);
@@ -127,9 +118,6 @@ internal sealed class AuthenticationService : IAuthenticationService
         var patientNew = new Patient(dni, request.Email, Guid.Parse(user.Id));
 
         var newPatient = await _persistence.Add<Patient>(patientNew);
-
-        if (newPatient is null)
-            _logger.LogError("Error al crear el paciente con Email: {Email}", request.Email);
 
         _ = await _userManager.AddToRoleAsync(user, Roles.Patient);
 
