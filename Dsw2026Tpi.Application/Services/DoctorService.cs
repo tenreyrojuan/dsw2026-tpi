@@ -22,7 +22,7 @@ internal sealed class DoctorService : IDoctorService
     public async Task<Pagination<DoctorModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
             var doctors = await _persistence.Paginate<Doctor, string>(pageSize, pageIndex, 
-                                                   d => d.IsActive == true && (string.IsNullOrWhiteSpace(name) ||
+                                                   d => d.Deleted != true && (string.IsNullOrWhiteSpace(name) ||
                                                    d.Name.Contains(name)), x => x.Name, nameof(Doctor.Specialty));
         
         return doctors.Map(d => new DoctorModel.Response(d.Id, d.Name, d.LicenseNumber,
@@ -60,7 +60,8 @@ internal sealed class DoctorService : IDoctorService
             throw new ValidationException()
                 .WithDetail(nameof(request.Name),Issue.INVALID_NAME);
 
-        bool takenLicence = await _persistence.Any<Doctor>(d => d.LicenseNumber.Equals(request.LicenseNumber));
+        bool takenLicence 
+            = await _persistence.Any<Doctor>(d => d.LicenseNumber.Equals(request.LicenseNumber) && d.Deleted!);
         if (takenLicence)
             throw new ConflictException()
                 .WithDetail(nameof(request.LicenseNumber),Issue.DUPLICATE_LICENCE);
