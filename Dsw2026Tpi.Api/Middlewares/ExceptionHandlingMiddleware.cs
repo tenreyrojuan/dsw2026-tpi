@@ -45,6 +45,7 @@ public class ExceptionHandlingMiddleware
             AuthorizationException => HttpStatusCode.Forbidden,
             BusinessRuleException => HttpStatusCode.UnprocessableContent,
             TooManyRequestsException => HttpStatusCode.TooManyRequests,
+            PreconditionException => HttpStatusCode.PreconditionFailed,
             _ => HttpStatusCode.InternalServerError,
         };
         var result = JsonSerializer.Serialize(error);
