@@ -29,25 +29,27 @@ internal sealed class AdvancedSearchesService : IAdvancedSearchesService
     public async Task<Pagination<AdvancedSearchesModel.AppointmentSearchResponse>> SearchAppointments(
         int pageSize,
         int pageIndex, 
-        Guid specialtyId, 
-        Guid doctorId, 
-        string searchTerm, 
-        DateOnly date)
+        Guid? specialtyId,
+        Guid? doctorId,
+        string? searchTerm,
+        DateOnly? date)
     {
 
-        var doctor = await _persistence.GetById<Doctor>(doctorId)
-            ?? throw new EntityNotFoundException(nameof(Doctor))
-            .WithDetail(nameof(doctorId), Issue.ID_NOTFOUND);
+        if (doctorId is not null)
+            _ = await _persistence.GetById<Doctor>(doctorId.Value)
+                ?? throw new EntityNotFoundException(nameof(Doctor))
+                .WithDetail(nameof(doctorId), Issue.ID_NOTFOUND);
 
-        var specialty = await _persistence.GetById<Specialty>(specialtyId)
-            ?? throw new EntityNotFoundException(nameof(Specialty))
-            .WithDetail(nameof(specialtyId), Issue.ID_NOTFOUND);
+        if (specialtyId is not null)
+            _ = await _persistence.GetById<Specialty>(specialtyId.Value)
+                ?? throw new EntityNotFoundException(nameof(Specialty))
+                .WithDetail(nameof(specialtyId), Issue.ID_NOTFOUND);
 
         Expression<Func<Appointment, bool>> predicate
-            = a => a.AvailabilitySlot.AvailabilityRule.DoctorId == doctorId &&
-                   a.AvailabilitySlot.AvailabilityRule.Doctor.SpecialtyId == specialtyId &&
-                   a.AvailabilitySlot.Date == date &&
-                   a.Patient.Dni.Contains(searchTerm) || a.Patient.FullName.Contains(searchTerm);
+            = a => (doctorId == null || a.AvailabilitySlot.AvailabilityRule.DoctorId == doctorId) &&
+                   (specialtyId == null || a.AvailabilitySlot.AvailabilityRule.Doctor.SpecialtyId == specialtyId) &&
+                   (date == null || a.AvailabilitySlot.Date == date) &&
+                   (searchTerm == null || a.Patient.Dni.Contains(searchTerm) || a.Patient.FullName.Contains(searchTerm));
 
         Expression<Func<Appointment, DateOnly>> sortOrder
             = a => a.AvailabilitySlot.Date;
