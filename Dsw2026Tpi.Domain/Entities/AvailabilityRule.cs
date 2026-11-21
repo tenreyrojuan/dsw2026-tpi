@@ -74,7 +74,7 @@ public sealed class AvailabilityRule : EntityBase
     
     public IReadOnlyCollection<AvailabilitySlot> AvailabilitySlots => _availabilitySlots.AsReadOnly();
 
-    public bool IsOfMonth(int currentMonth, int currentYear) => Month == currentMonth && Year == currentYear;
+    public bool IsOfMonth(int month, int year) => Month == month && Year == year;
     
     public bool HasBookedSlots => _availabilitySlots.Any(s => s.IsBooked);
     

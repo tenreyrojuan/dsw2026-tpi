@@ -1,10 +1,11 @@
-﻿using Dsw2026Tpi.CrossCutting.Exceptions;
+using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.CrossCutting.Identity;
 using Dsw2026Tpi.Data.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -39,7 +40,9 @@ public static class SecurityConfigurationExtensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = issuer,
                     ValidAudience = audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    RoleClaimType = ClaimTypes.Role,
+                    NameClaimType = ClaimTypes.Name
                 };
             });
         services.AddAuthorizationBuilder()

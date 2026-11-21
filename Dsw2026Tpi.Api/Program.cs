@@ -40,8 +40,6 @@ public class Program
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-            app.UseRateLimiter();
-
             app.UseCors();
 
             app.UseSerilogRequestLogging();
@@ -58,6 +56,7 @@ public class Program
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseRateLimiter();
 
             app.MapControllers();
             app.MapHealthChecks("/health-check");

@@ -117,7 +117,7 @@ public sealed class Doctor : EntityBase
     // se listan las disponibilidades que son de este mes, este año y ademas no tienen slots ocupados
     public List<AvailabilityRule> GetAvailableMonthlyAvailabilityRules(int currentMonth, int currentYear)
     {
-        return AvailabilityRules
+        return _availabilityRules
             .Where(rule =>
                 rule.IsOfMonth(currentMonth, currentYear)
                 && !rule.HasBookedSlots

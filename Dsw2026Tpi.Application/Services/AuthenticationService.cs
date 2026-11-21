@@ -1,4 +1,4 @@
-﻿using Dsw2026Tpi.Application.Dtos;
+using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.CrossCutting.Helpers;
@@ -45,11 +45,7 @@ internal sealed class AuthenticationService : IAuthenticationService
         var user = await _userManager.FindByEmailAsync(request.Email)
             ?? throw new AuthenticationException()
                 .WithDetail(nameof(request.Email), Issue.EMAIL_NOTFOUND);
-        /*
-        if (await _userManager.IsInRoleAsync(user, Roles.Administrator))
-            throw new AuthenticationException()
-                .WithDetail(nameof(request.Email), Issue.DUPLICATE_EMAIL);
-        */
+
         var result = await _signInManager.CheckPassword(user, request.Password);
 
         if (!result)
@@ -59,13 +55,14 @@ internal sealed class AuthenticationService : IAuthenticationService
                 .WithDetail(nameof(result), Issue.PASSWORD_ERROR);
         }
 
-        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+        if (!await _userManager.IsInRoleAsync(user, Roles.Administrator))
+            throw new AuthorizationException();
 
-        var token = _jwtService.GenerateToken(user.UserName!, role);
+        var token = _jwtService.GenerateToken(user.UserName!, Roles.Administrator);
 
         return new LoginAdminModel.Response(
             token,
-            role!.ToUpper()
+            Roles.Administrator.ToUpper()
         );
     }
 
@@ -88,11 +85,6 @@ internal sealed class AuthenticationService : IAuthenticationService
         // Usuario Existe
         if (user != null)
         {
-            /*
-            if (await _userManager.IsInRoleAsync(user, Roles.Patient))
-                throw new AuthenticationException()
-                    .WithDetail(nameof(request.Email), Issue.DUPLICATE_EMAIL);
-            */
             var patient = await _persistence.First<Patient>(p => p.UserId == Guid.Parse(user.Id))
                     ?? throw new AuthenticationException()
                     .WithDetail(nameof(request.Dni), Issue.DNI_NOTFOUND);
@@ -102,7 +94,7 @@ internal sealed class AuthenticationService : IAuthenticationService
                 throw new AuthenticationException()
                     .WithDetail(nameof(dni), Issue.PASSWORD_ERROR);
             }
-            var token = _jwtService.GenerateToken(user.UserName!, role);
+            var token = _jwtService.GenerateToken(user.UserName!, role, dni);
             return new LoginPatientModel.Response(
                 token,
                 role
@@ -135,7 +127,7 @@ internal sealed class AuthenticationService : IAuthenticationService
 
         _logger.LogInformation("Paciente registrado: {Dni}", dni);
 
-        var tokenNew = _jwtService.GenerateToken(user.UserName!, role);
+        var tokenNew = _jwtService.GenerateToken(user.UserName!, role, dni);
         return new LoginPatientModel.Response(tokenNew, role.ToUpper());
     }
 
@@ -153,7 +145,11 @@ internal sealed class AuthenticationService : IAuthenticationService
             throw new ConflictException()
                 .WithDetail(result.Errors.Select(e => (e.Code, e.Description)));
 
-        _ = await _userManager.AddToRoleAsync(user, Roles.Administrator);
+        var roleResult = await _userManager.AddToRoleAsync(user, Roles.Administrator);
+
+        if (!roleResult.Succeeded)
+            throw new ConflictException()
+                .WithDetail(roleResult.Errors.Select(e => (e.Code, e.Description)));
 
         _logger.LogInformation("Usuario registrado: {Email}", request.Email);
 

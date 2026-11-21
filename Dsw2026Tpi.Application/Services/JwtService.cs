@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -14,7 +14,7 @@ internal sealed class JwtService
         _config = config;
     }
 
-    public string GenerateToken(string username, string? role)
+    public string GenerateToken(string username, string? role, string? dni = null)
     {
         if (_config == null) throw new ArgumentNullException();
         var jwtConfig = _config.GetSection("Jwt");
@@ -29,7 +29,8 @@ internal sealed class JwtService
         {
             new Claim(JwtRegisteredClaimNames.Sub, username),
             new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, role ?? string.Empty)
+            new Claim(ClaimTypes.Role, role ?? string.Empty),
+            new Claim("patientDni", dni ?? string.Empty)
         };
 
         var token = new JwtSecurityToken(

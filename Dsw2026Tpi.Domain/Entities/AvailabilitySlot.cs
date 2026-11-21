@@ -1,4 +1,5 @@
-﻿using Dsw2026Tpi.CrossCutting.Exceptions;
+﻿using Dsw2026Tpi.CrossCutting.Resources;
+using Dsw2026Tpi.CrossCutting.Exceptions;
 
 namespace Dsw2026Tpi.Domain.Entities;
 //Turno
@@ -77,7 +78,18 @@ public sealed class AvailabilitySlot : EntityBase
     
     public bool IsAvailable =>  AvailabilitySlotState == AvailabilitySlotState.AVAILABLE;
     public bool IsBooked => AvailabilitySlotState == AvailabilitySlotState.BOOKED;
-    
+
+    public void CheckIfValid()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        if (Date < today)
+            throw new BusinessRuleException()
+                .WithDetail(nameof(Date), Issue.INVALID_SLOT);
+        
+        if (!IsAvailable)
+           throw new BusinessRuleException()
+                .WithDetail(nameof(Id), Issue.NOTAVAILABLE_SLOT);
+    }
 
     public void Book(Appointment appointment)
     {

@@ -41,14 +41,7 @@ internal sealed class AppointmentService : IAppointmentService
             ?? throw new EntityNotFoundException(nameof(AvailabilitySlot))
             .WithDetail(nameof(request.AvailabilitySlotId), Issue.ID_NOTFOUND);
 
-        var today = DateOnly.FromDateTime(DateTime.Now);
-        if (availabilitySlot.Date < today)
-            throw new BusinessRuleException()
-                .WithDetail(nameof(availabilitySlot.Date), Issue.INVALID_SLOT);
-
-        if (!availabilitySlot.IsAvailable)
-            throw new BusinessRuleException()
-                .WithDetail(nameof(request.AvailabilitySlotId), Issue.NOTAVAILABLE_SLOT);
+        availabilitySlot.CheckIfValid();
 
         var newAppointment = Appointment.Create(patient, availabilitySlot, request.Reason);
 
