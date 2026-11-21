@@ -85,7 +85,10 @@ public sealed class Doctor : EntityBase
         {
             var weekDay = day.Day.ParseDayOfWeek();
 
-            CheckOverlappingAvailabilityRules(currentMonth, currentYear, weekDay, day.StartTime, day.EndTime);
+            if (createdAvailabilities.Any(a => a.WeekDay == weekDay))
+                throw new ConflictException().WithDetail(nameof(day), Issue.OVERLAP);
+
+            CheckOverlappingAvailabilityRules(currentMonth, currentYear, weekDay);
 
             var availabilityRule 
                 = AvailabilityRule.Create(currentMonth, currentYear, weekDay, day.StartTime, day.EndTime, this);
@@ -100,15 +103,12 @@ public sealed class Doctor : EntityBase
     private void CheckOverlappingAvailabilityRules(
         int currentMonth, 
         int currentYear, 
-        DayOfWeek weekDay, 
-        TimeOnly startTime,
-        TimeOnly endTime)
+        DayOfWeek weekDay)
     {
         bool hasOverlap = _availabilityRules.Any(
             a => a.Month == currentMonth &&
                  a.Year == currentYear &&
-                 a.WeekDay == weekDay &&
-                 a.HasOverlappingSchedules(startTime, endTime)
+                 a.WeekDay == weekDay
                  );
         
         if (hasOverlap) throw new ConflictException().WithDetail(nameof(hasOverlap), Issue.OVERLAP);
