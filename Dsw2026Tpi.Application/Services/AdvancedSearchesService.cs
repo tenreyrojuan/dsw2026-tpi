@@ -63,6 +63,8 @@ internal sealed class AdvancedSearchesService : IAdvancedSearchesService
         return appointments.Map(a => new AdvancedSearchesModel.AppointmentSearchResponse(
             a.Id,
             a.AppointmentState.ToString(),
+            a.AvailabilitySlot.Date,
+            a.AvailabilitySlot.StartingTime,
             new AdvancedSearchesModel.PatientDto(a.Patient.Dni, a.Patient.FullName),
                 new AdvancedSearchesModel.DoctorDto(
                     a.AvailabilitySlot.AvailabilityRule.DoctorId,
