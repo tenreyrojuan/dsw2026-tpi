@@ -7,7 +7,6 @@ namespace Dsw2026Tpi.Api.Controllers;
 
 [Route("api/slots")]
 [Authorize(Policy = Policies.AdminPolicy)]
-[AllowAnonymous]
 public class SlotController : AppController
 {
     private readonly ISlotService _service;

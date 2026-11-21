@@ -60,7 +60,7 @@ internal sealed class AppointmentService : IAppointmentService
 
         var appointments = await _persistence.GetFiltered<Appointment>(
             a => a.Patient.Dni == dni &&
-                 a.IsBooked &&
+                 a.AppointmentState == AppointmentState.BOOKED &&
                  a.AvailabilitySlot.Date >= today,
             nameof(Patient),
             $"{nameof(AvailabilitySlot)}.{nameof(AvailabilityRule)}.{nameof(Doctor)}.{nameof(Specialty)}");

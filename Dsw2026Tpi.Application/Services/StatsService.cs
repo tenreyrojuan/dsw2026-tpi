@@ -18,7 +18,7 @@ internal sealed class StatsService : IStatsService
     {
         var today = DateOnly.FromDateTime(DateTime.Now);
 
-        var activeDoctors = await _persistence.Count<Doctor>(d => d.IsActive);
+        var activeDoctors = await _persistence.Count<Doctor>(d => !d.Deleted);
 
         var activeSpecialties = await _persistence.Count<Specialty>(s => true);
 

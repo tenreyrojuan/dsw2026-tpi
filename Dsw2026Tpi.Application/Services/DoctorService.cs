@@ -61,7 +61,7 @@ internal sealed class DoctorService : IDoctorService
                 .WithDetail(nameof(request.Name),Issue.INVALID_NAME);
 
         bool takenLicence 
-            = await _persistence.Any<Doctor>(d => d.LicenseNumber.Equals(request.LicenseNumber) && d.Deleted!);
+            = await _persistence.Any<Doctor>(d => d.LicenseNumber.Equals(request.LicenseNumber) && !d.Deleted);
         if (takenLicence)
             throw new ConflictException()
                 .WithDetail(nameof(request.LicenseNumber),Issue.DUPLICATE_LICENCE);

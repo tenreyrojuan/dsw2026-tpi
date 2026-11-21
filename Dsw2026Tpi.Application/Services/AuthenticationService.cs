@@ -97,7 +97,7 @@ internal sealed class AuthenticationService : IAuthenticationService
             var token = _jwtService.GenerateToken(user.UserName!, role, dni);
             return new LoginPatientModel.Response(
                 token,
-                role
+                role.ToUpper()
             );
         }
         // Usuario Nuevo
