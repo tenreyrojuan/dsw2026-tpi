@@ -1,5 +1,6 @@
 using Dsw2026Tpi.Api.Configurations;
 using Dsw2026Tpi.Api.Middlewares;
+using Dsw2026Tpi.CrossCutting.Identity;
 using Dsw2026Tpi.Data.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -44,18 +45,15 @@ public class Program
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-                if (!await roleManager.RoleExistsAsync("Admin"))
-                    await roleManager.CreateAsync(new IdentityRole("Admin"));
-
-                var admin = await userManager.FindByEmailAsync("admin@medportal.com");
+                var admin = await userManager.FindByEmailAsync("admin1@medportal.com");
                 if (admin is null)
                 {
-                    admin = new ApplicationUser("admin", "admin@medportal.com") { EmailConfirmed = true };
+                    admin = new ApplicationUser("admin", "admin1@medportal.com") { EmailConfirmed = true };
                     await userManager.CreateAsync(admin, "Admin!123");
                 }
 
-                if (!await userManager.IsInRoleAsync(admin, "Admin"))
-                    await userManager.AddToRoleAsync(admin, "Admin");
+                if (!await userManager.IsInRoleAsync(admin, Roles.Administrator))
+                    await userManager.AddToRoleAsync(admin, Roles.Administrator);
             }
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
