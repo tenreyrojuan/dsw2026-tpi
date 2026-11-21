@@ -68,7 +68,7 @@ internal sealed class SpecialtyService : ISpecialtyService
             ?? throw new EntityNotFoundException(nameof(Specialty))
             .WithDetail(nameof(id), Issue.ID_NOTFOUND);
 
-        var anyDoctor = await _persistence.Any<Doctor>(d => d.Specialty.Id == specialty.Id);
+        var anyDoctor = await _persistence.Any<Doctor>(d => d.Specialty.Id == specialty.Id && !d.Deleted);
         if (anyDoctor) 
             throw new PreconditionException("PRECONDITION_FAILED","No se cumplio alguna condicion previa")
                 .WithDetail(nameof(Specialty), "La especialidad cuenta con medicos");
