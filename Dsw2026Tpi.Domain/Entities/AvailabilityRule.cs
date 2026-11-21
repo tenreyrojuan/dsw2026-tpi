@@ -40,6 +40,10 @@ public sealed class AvailabilityRule : EntityBase
         TimeOnly endingHour, 
         Doctor doctor)
     {
+        var beginning = new TimeOnly(7,0);
+        var ending = new TimeOnly(20, 0);
+        
+        
         if (month < 1 || month > 12)
         {
             throw new BusinessRuleException()
@@ -57,6 +61,14 @@ public sealed class AvailabilityRule : EntityBase
                 .WithDetail(
                     $"{nameof(startingHour)} and {nameof(endingHour)}",
                     "El tiempo de comienzo no puede ser menor a la de final");
+        }
+
+        if (startingHour < beginning || endingHour > ending)
+        {
+            throw new BusinessRuleException()
+                .WithDetail(
+                    $"{nameof(startingHour)} and {nameof(endingHour)}",
+                    "Los horarios no son validos para el hospital");
         }
         
         return new AvailabilityRule(month, year, weekDay, startingHour, endingHour, doctor);

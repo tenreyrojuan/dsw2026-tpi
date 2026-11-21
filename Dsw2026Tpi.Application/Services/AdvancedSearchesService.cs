@@ -26,7 +26,13 @@ internal sealed class AdvancedSearchesService : IAdvancedSearchesService
                 a => new AppointmentModel.Response(a.Patient.FullName, a.AvailabilitySlot.Date, a.AvailabilitySlot.StartingTime));
     }
 
-    public async Task<Pagination<AdvancedSearchesModel.AppointmentSearchResponse>> SearchAppointments(int pageSize, int pageIndex, Guid specialtyId, Guid doctorId, long dni, DateOnly date)
+    public async Task<Pagination<AdvancedSearchesModel.AppointmentSearchResponse>> SearchAppointments(
+        int pageSize,
+        int pageIndex, 
+        Guid specialtyId, 
+        Guid doctorId, 
+        string searchTerm, 
+        DateOnly date)
     {
 
         var doctor = await _persistence.GetById<Doctor>(doctorId)
@@ -37,12 +43,11 @@ internal sealed class AdvancedSearchesService : IAdvancedSearchesService
             ?? throw new EntityNotFoundException(nameof(Specialty))
             .WithDetail(nameof(specialtyId), Issue.ID_NOTFOUND);
 
-        var patientDni = dni.ToString();
         Expression<Func<Appointment, bool>> predicate
             = a => a.AvailabilitySlot.AvailabilityRule.DoctorId == doctorId &&
                    a.AvailabilitySlot.AvailabilityRule.Doctor.SpecialtyId == specialtyId &&
                    a.AvailabilitySlot.Date == date &&
-                   a.Patient.Dni == patientDni;
+                   a.Patient.Dni.Contains(searchTerm) || a.Patient.FullName.Contains(searchTerm);
 
         Expression<Func<Appointment, DateOnly>> sortOrder
             = a => a.AvailabilitySlot.Date;
@@ -56,7 +61,7 @@ internal sealed class AdvancedSearchesService : IAdvancedSearchesService
         return appointments.Map(a => new AdvancedSearchesModel.AppointmentSearchResponse(
             a.Id,
             a.AppointmentState.ToString(),
-            new AdvancedSearchesModel.PatientDto(dni, a.Patient.FullName),
+            new AdvancedSearchesModel.PatientDto(a.Patient.Dni, a.Patient.FullName),
                 new AdvancedSearchesModel.DoctorDto(
                     a.AvailabilitySlot.AvailabilityRule.DoctorId,
                     a.AvailabilitySlot.AvailabilityRule.Doctor.Name,

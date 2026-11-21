@@ -19,6 +19,7 @@ public class SpecialtyController : AppController
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize(Policy = Policies.PatientPolicy)]
     public async Task<IActionResult> GetAll([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] string? name = null)
     {
         var result = await _service.GetAll(pageSize, pageIndex, name);
