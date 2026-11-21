@@ -27,9 +27,9 @@ public class AdvancedSearchesController : AppController
 
     [HttpGet("search")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchAppointments([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] Guid specialtyId, [FromQuery] Guid doctorId, [FromQuery] long dni, [FromQuery] DateOnly date)
+    public async Task<IActionResult> SearchAppointments([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] Guid specialtyId, [FromQuery] Guid doctorId, [FromQuery] string searchTerm, [FromQuery] DateOnly date)
     {
-        var result = await _service.SearchAppointments(pageSize, pageIndex, specialtyId, doctorId, dni, date);
+        var result = await _service.SearchAppointments(pageSize, pageIndex, specialtyId, doctorId, searchTerm, date);
         return Ok(result);
     }
 }

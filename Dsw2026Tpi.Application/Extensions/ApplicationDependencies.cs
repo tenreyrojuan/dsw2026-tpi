@@ -15,6 +15,8 @@ public static class ApplicationDependencies
         services.AddScoped<IAdvancedSearchesService, AdvancedSearchesService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddScoped<ISlotService,SlotService>();
+        services.AddScoped<IStatsService, StatsService>();
+        services.AddScoped<IHolidayProviderService, HolidayProviderService>();
         services.AddSingleton<JwtService>();
         return services;
     }

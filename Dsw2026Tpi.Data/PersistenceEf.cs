@@ -57,6 +57,12 @@ internal sealed class PersistenceEf : IPersistence
     {
         return await _context.Set<T>().AnyAsync(predicate);
     }
+    
+    public async Task<int> Count<T>(Expression<Func<T, bool>> predicate) where T : EntityBase
+    {
+        return await _context.Set<T>().CountAsync(predicate);
+    }
+
     /// <summary>
     /// Metodo de añadir y eliminar colecciones 
     /// Surge de la necesidad de poder actualizar las colecciones de una entidad

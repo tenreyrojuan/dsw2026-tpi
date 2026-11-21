@@ -120,9 +120,6 @@ internal sealed class AuthenticationService : IAuthenticationService
 
         var newPatient = await _persistence.Add<Patient>(patientNew);
 
-        if (newPatient is null)
-            _logger.LogError("Error al crear el paciente con Email: {Email}", request.Email);
-
         _ = await _userManager.AddToRoleAsync(user, Roles.Patient);
 
         _logger.LogInformation("Paciente registrado: {Dni}", dni);
