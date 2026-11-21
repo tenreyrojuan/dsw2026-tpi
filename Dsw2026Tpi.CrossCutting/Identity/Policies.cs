@@ -4,6 +4,7 @@ public class Policies
 {
     public const string AdminPolicy = "AdminPolicy";
     public const string PatientPolicy = "PatientPolicy";
+    public const string AdminOrPatientPolicy = "AdminOrPatientPolicy";
 
     // politicas para el rate limiting
     public const string AdminRequestsPolicy = "AdminRequestsPolicy";

@@ -53,24 +53,28 @@ internal sealed class AppointmentService : IAppointmentService
         return new AppointmentModel.Response(appointment.Patient.FullName, availabilitySlot.Date, availabilitySlot.StartingTime);
     }
 
-    public async Task<IEnumerable<AppointmentModel.Response>> GetPatientAppointment(long patientDni)
+    public async Task<IEnumerable<AppointmentModel.PatientAppointmentResponse>> GetPatientAppointment(long patientDni)
     {
         var dni = patientDni.ToString();
-        DateOnly today = DateOnly.FromDateTime(DateTime.Now);
-        
-        var appointment = await _persistence.GetFiltered<Appointment>(
-            a => a.Patient.Dni == dni && 
-                 a.IsBooked && 
+        var today = DateOnly.FromDateTime(DateTime.Now);
+
+        var appointments = await _persistence.GetFiltered<Appointment>(
+            a => a.Patient.Dni == dni &&
+                 a.IsBooked &&
                  a.AvailabilitySlot.Date >= today,
-            nameof (Patient),
-            nameof(AvailabilitySlot)
-            );
-        
-        return appointment is null ? [] : 
-            appointment.Select(
-                a => new AppointmentModel.Response(
-                    a.Patient.FullName, a.AvailabilitySlot.Date, a.AvailabilitySlot.StartingTime)
-                );
+            nameof(Patient),
+            $"{nameof(AvailabilitySlot)}.{nameof(AvailabilityRule)}.{nameof(Doctor)}.{nameof(Specialty)}");
+
+        return appointments is null ? [] :
+            appointments
+                .OrderBy(a => a.AvailabilitySlot.Date)
+                .ThenBy(a => a.AvailabilitySlot.StartingTime)
+                .Select(a => new AppointmentModel.PatientAppointmentResponse(
+                    a.Id,
+                    a.AvailabilitySlot.AvailabilityRule.Doctor.Name,
+                    a.AvailabilitySlot.AvailabilityRule.Doctor.Specialty.Name,
+                    a.AvailabilitySlot.Date,
+                    a.AvailabilitySlot.StartingTime));
     }
 
     public async Task DeleteAppointment (Guid appointmentId)

@@ -45,11 +45,19 @@ public static class SecurityConfigurationExtensions
                     NameClaimType = ClaimTypes.Name
                 };
             });
+
         services.AddAuthorizationBuilder()
-            .AddPolicy(Policies.AdminPolicy, policy =>
-                policy.RequireRole(Roles.Administrator))
-            .AddPolicy(Policies.PatientPolicy, policy =>
-                policy.RequireRole(Roles.Patient));
+    .AddPolicy(Policies.AdminPolicy, policy =>
+        policy.RequireRole(Roles.Administrator))
+    .AddPolicy(Policies.PatientPolicy, policy =>
+        policy.RequireRole(Roles.Patient))
+    .AddPolicy(Policies.AdminOrPatientPolicy, policy =>
+        policy.RequireRole(Roles.Administrator, Roles.Patient));
+        //services.AddAuthorizationBuilder()
+        //    .AddPolicy(Policies.AdminPolicy, policy =>
+        //        policy.RequireRole(Roles.Administrator))
+        //    .AddPolicy(Policies.PatientPolicy, policy =>
+        //        policy.RequireRole(Roles.Patient));
         return services;
     }
 

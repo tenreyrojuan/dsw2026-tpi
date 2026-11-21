@@ -10,5 +10,5 @@ public record AppointmentModel
     public record Request(Guid DoctorId, Guid AvailabilitySlotId, PatientDto Patient, string Reason);
     public record Response(string PatientName, DateOnly Date, TimeOnly StartingTime);
     public record PatientDto(string Dni);
-    
+    public record PatientAppointmentResponse( Guid Id, string DoctorName, string SpecialtyName, DateOnly Date, TimeOnly StartingTime);
 }

@@ -100,6 +100,31 @@ internal sealed class DoctorService : IDoctorService
             new DoctorModel.SpecialtyDto(updatedDoctor.SpecialtyId, updatedDoctor.Specialty.Name));
     }
 
+    public async Task<IEnumerable<SlotModel.Response>> GetDoctorSlots(Guid doctorId, DateOnly from, DateOnly to)
+    {
+        if (to < from)
+            throw new ValidationException()
+                .WithDetail(nameof(to), "La fecha final no puede ser anterior a la inicial");
+
+        _ = await _persistence.GetById<Doctor>(doctorId)
+            ?? throw new EntityNotFoundException(ErrorCodes.ENTITY_NOTFOUND)
+            .WithDetail(nameof(doctorId), Issue.ID_NOTFOUND);
+
+        var today = DateOnly.FromDateTime(DateTime.Now);
+
+        var slots = await _persistence.GetFiltered<AvailabilitySlot>(
+            s => s.AvailabilityRule.DoctorId == doctorId
+                 && s.AvailabilitySlotState == AvailabilitySlotState.AVAILABLE
+                 && s.Date >= from && s.Date <= to
+                 && s.Date >= today);
+
+        return slots is null ? [] :
+            slots
+                .OrderBy(s => s.Date)
+                .ThenBy(s => s.StartingTime)
+                .Select(s => new SlotModel.Response(s.Id, s.Date, s.StartingTime, s.EndingTime));
+    }
+
     public async Task DeleteDoctor(Guid doctorId)
     {
         var doctor = await _persistence.GetById<Doctor>(doctorId) 
